@@ -1,0 +1,157 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    line-height: 1.6;
+    color: #333;
+    background-color: #f4f4f4;
+}
+
+/* Header Styles */
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 4rem 0;
+    background-image: url(BG.png);
+    color: white;
+    text-align: center;
+}
+
+.header-left {
+    flex: 0 0 150px;
+}
+
+.header-right {
+    text-align: left;
+}
+
+.profile-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+}
+
+/* Navigation */
+nav {
+    background-color: #242861;
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    border: 2px solid black;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+}
+
+nav ul li {
+    margin: 0 1.5rem;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Section Styles */
+section {
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.about-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.about-gap {
+    margin-top: 2rem;
+}
+
+.about-box {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    flex: 1;
+    text-align: center;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+/* Project Cards */
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.project-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+/* Skills */
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.skill-tag {
+    background-color: #3498db;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+/* Contact Form */
+.contact-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Footer */
+footer {
+    background-color: #242861;
+    color: white;
+    text-align: center;
+    padding: 2rem 0;
+    border: 2px solid black;
+}
