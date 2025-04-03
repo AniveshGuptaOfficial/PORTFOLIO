@@ -43,8 +43,8 @@ To run this project locally:
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/AniveshGuptaOfficial/Anivesh-Gupta-Portfolio.git
-   cd Anivesh-Gupta-Portfolio
+   git clone https://github.com/AniveshGuptaOfficial/PORTFOLIO.git
+   cd PORTFOLIO
    ```
 
 2. **Open the Project**:
