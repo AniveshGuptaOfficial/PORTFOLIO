@@ -77,3 +77,39 @@ document.querySelectorAll('.certificate-image img').forEach(img => {
         });
     });
 });
+
+// Certificate and Resume image click handler
+document.querySelectorAll('.certificate-image img, .resume-image img').forEach(img => {
+    img.addEventListener('click', () => {
+        const fullScreenDiv = document.createElement('div');
+        fullScreenDiv.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        `;
+
+        const fullImg = document.createElement('img');
+        fullImg.src = img.src;
+        fullImg.style.cssText = `
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        `;
+
+        fullScreenDiv.appendChild(fullImg);
+        document.body.appendChild(fullScreenDiv);
+
+        fullScreenDiv.addEventListener('click', () => {
+            document.body.removeChild(fullScreenDiv);
+        });
+    });
+});
+
