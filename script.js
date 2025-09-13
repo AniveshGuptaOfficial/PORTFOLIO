@@ -113,3 +113,9 @@ document.querySelectorAll('.certificate-image img, .resume-image img').forEach(i
     });
 });
 
+// New functionality for the resume download link
+document.querySelector('.resume-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    const pdfUrl = e.currentTarget.href;
+    window.open(pdfUrl, '_blank');
+});
