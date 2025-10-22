@@ -256,6 +256,81 @@ section {
     margin-top: 1rem;
 }
 
+/* Reports & Case Studies */
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.report-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.report-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.report-icon {
+    font-size: 2.5rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.report-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.8rem;
+    color: #2c3e50;
+}
+
+.report-card p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+.report-link {
+    background: #667eea;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+}
+
+.report-link:hover {
+    background: #764ba2;
+    transform: translateY(-3px);
+}
+
+.pdf-viewer-container {
+    margin-top: 3rem;
+    padding: 0 1rem;
+}
+
+.pdf-viewer {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+#pdf-frame {
+    border: none;
+    border-radius: 15px;
+}
+
 /* Contact */
 .contact-form {
     background: white;
@@ -623,6 +698,15 @@ footer a:hover {
 
     .project-link {
         padding: 0.6rem 1rem;
+    }
+
+    /* Reports & Case Studies */
+    .pdf-viewer {
+        margin: 0 1rem;
+    }
+    
+    #pdf-frame {
+        height: 400px;
     }
 
     /* Certificates */

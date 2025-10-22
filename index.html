@@ -7,350 +7,549 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.3/babel.min.js"></script>
 </head>
 <body>
-    <header class="header-container">
-        <div class="header-content">
-            <img src="Anivesh Gupta.jpg" alt="Anivesh Gupta" class="profile-img">
-            <div class="header-right">
-                <h1>Anivesh Gupta</h1>
-                <p>Web Developer & Designer</p>
-            </div>
-        </div>
-    </header>
+    <div id="root"></div>
+    <script type="text/babel">
+        // Header Component
+        function Header() {
+            return (
+                <header className="header-container">
+                    <div className="header-content">
+                        <img src="Anivesh Gupta.jpg" alt="Anivesh Gupta" className="profile-img" />
+                        <div className="header-right">
+                            <h1>Anivesh Gupta</h1>
+                            <p>Web Developer & Designer</p>
+                        </div>
+                    </div>
+                </header>
+            );
+        }
 
-    <nav>
-        <ul>
-            <li><a href="#about">About</a></li>
-            <li><a href="#skills">Skills</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#certificates">Certificates</a></li>
-            <li><a href="#resume">Resume</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
+        // Nav Component
+        function Nav() {
+            const navItems = [
+                { href: "#about", label: "About" },
+                { href: "#skills", label: "Skills" },
+                { href: "#projects", label: "Projects" },
+                { href: "#reports", label: "Reports & Case Studies" },
+                { href: "#certificates", label: "Certificates" },
+                { href: "#resume", label: "Resume" },
+                { href: "#contact", label: "Contact" }
+            ];
 
-    <section id="about">
-        <h2 class="section-title">About Me</h2>
-        <div class="about-container">
-            <div class="about-box">
-                <p>Hi, I'm Anivesh Gupta, a passionate web developer and designer with a keen interest in behavioral alignment in social interactions, technology acceptance, and empirical evaluations of learning systems. Currently pursuing my studies at VIT Vellore, I have a strong foundation in programming, logic, and computational problem-solving. I enjoy working on real-world projects and continuously expanding my technical expertise.</p>
-                <div class="about-container about-gap">
-                    <div class="about-box">
-                        <img src="national-high-school-cbse.jpeg" alt="NHS CBSE" class="profile-img">
-                        <h3>National High School - CBSE</h3>
-                        <h3>[ 2009 - 2021 ]</h3>
-                        <p>Completed education till 10th grade with an overall percentage of 68.2%.</p>
-                    </div>
-                    <div class="about-box">
-                        <img src="national-high-school-wbbse.jpeg" alt="NHS WBBSE" class="profile-img">
-                        <h3>National High School - WBBSE</h3>
-                        <h3>[ 2021 - 2023 ]</h3>
-                        <p>Completed education till 12th grade with an overall percentage of 71.8%.</p>
-                    </div>
-                    <div class="about-box">
-                        <img src="Vellore-institute-of-technology.jpg" alt="VIT" class="profile-img">
-                        <h3>Vellore Institute of Technology</h3>
-                        <h3>[ 2023 - 2027 ]</h3>
-                        <p>Currently in 5th semester with an overall CGPA of 7.88.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+            return (
+                <nav>
+                    <ul>
+                        {navItems.map((item, index) => (
+                            <li key={index}>
+                                <a href={item.href}>{item.label}</a>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+            );
+        }
 
-    <section id="skills">
-        <h2 class="section-title">Skills</h2>
-        <div class="skills-container">
-            <div class="skills-bar">
-                <h3 class="section-title">High-Level Languages</h3>
-                <div class="skill">
-                    <span class="skill-name">Python</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 83%;"></div>
-                        <span class="progress-text">83%</span>
+        // About Component
+        function About() {
+            return (
+                <section id="about">
+                    <h2 className="section-title">About Me</h2>
+                    <div className="about-container">
+                        <div className="about-box">
+                            <p>Hi, I'm Anivesh Gupta, a passionate web developer and designer with a keen interest in behavioral alignment in social interactions, technology acceptance, and empirical evaluations of learning systems. Currently pursuing my studies at VIT Vellore, I have a strong foundation in programming, logic, and computational problem-solving. I enjoy working on real-world projects and continuously expanding my technical expertise.</p>
+                            <div className="about-container about-gap">
+                                <div className="about-box">
+                                    <img src="national-high-school-cbse.jpeg" alt="NHS CBSE" className="profile-img" />
+                                    <h3>National High School - CBSE</h3>
+                                    <h3>[ 2009 - 2021 ]</h3>
+                                    <p>Completed education till 10th grade with an overall percentage of 68.2%.</p>
+                                </div>
+                                <div className="about-box">
+                                    <img src="national-high-school-wbbse.jpeg" alt="NHS WBBSE" className="profile-img" />
+                                    <h3>National High School - WBBSE</h3>
+                                    <h3>[ 2021 - 2023 ]</h3>
+                                    <p>Completed education till 12th grade with an overall percentage of 71.8%.</p>
+                                </div>
+                                <div className="about-box">
+                                    <img src="Vellore-institute-of-technology.jpg" alt="VIT" className="profile-img" />
+                                    <h3>Vellore Institute of Technology</h3>
+                                    <h3>[ 2023 - 2027 ]</h3>
+                                    <p>Currently in 5th semester with an overall CGPA of 7.88.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Calculus (MATLAB)</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 82%;"></div>
-                        <span class="progress-text">82%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Structured and Object-Oriented Programming (C/C++)</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 91%;"></div>
-                        <span class="progress-text">91%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Java</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 88%;"></div>
-                        <span class="progress-text">88%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Data Structures and Algorithms</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 88%;"></div>
-                        <span class="progress-text">88%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">FRONTEND (HTML/CSS/JAVASCRIPT)</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 82%;"></div>
-                        <span class="progress-text">82%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Design and Analysis of Algorithms</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 78%;"></div>
-                        <span class="progress-text">78%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Probability and Statistics (R)</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 97%;"></div>
-                        <span class="progress-text">97%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Database Systems (Oracle)</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 0%;"></div>
-                        <span class="progress-text">0%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Operating Systems</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 0%;"></div>
-                        <span class="progress-text">0%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Compiler Design (Lex/Ycc)</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 0%;"></div>
-                        <span class="progress-text">0%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Computer Networks</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 0%;"></div>
-                        <span class="progress-text">0%</span>
-                    </div>
-                </div>
-            </div>
-            <div class="skills-bar">
-                <h3 class="section-title">Low-Level Languages</h3>
-                <div class="skill">
-                    <span class="skill-name">Digital Systems Design (ModelSim)</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 75%;"></div>
-                        <span class="progress-text">75%</span>
-                    </div>
-                </div>
-                <div class="skill">
-                    <span class="skill-name">Microprocessors and Microcontrollers (Keil uVision5)</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 92%;"></div>
-                        <span class="progress-text">92%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <section id="projects">
-        <h2 class="section-title">Projects</h2>
-        <div class="project-grid">
-            <div class="project-card">
-                <div class="project-icon">
-                    <i class="fas fa-shopping-bag"></i>
-                </div>
-                <h3>VTrade</h3>
-                <p>A virtual window shopping experience that lets users browse products without purchasing.<br>Built using:</p>
-                <div class="tech-tags">
-                    <span class="tag">HTML</span>
-                    <span class="tag">CSS</span>
-                    <span class="tag">JavaScript</span>
-                    <span class="tag">Tailwind-CSS</span>
-                </div>
-                <a href="https://aniveshguptaofficial.github.io/VTrade/" class="project-link">View Project</a>
-            </div>
-            <div class="project-card">
-                <div class="project-icon">
-                    <i class="fas fa-book"></i>
-                </div>
-                <h3>Books4MU</h3>
-                <p>A platform to access and share university book resources.<br>Built using:</p>
-                <div class="tech-tags">
-                    <span class="tag">HTML</span>
-                    <span class="tag">CSS</span>
-                    <span class="tag">JavaScript</span>
-                    <span class="tag">Coming Soon</span>
-                </div>
-                <a href="https://aniveshguptaofficial.github.io/Books-For-My-University/" class="project-link">In Progress</a>
-            </div>
-            <div class="project-card">
-                <div class="project-icon">
-                    <i class="fas fa-chess"></i>
-                </div>
-                <h3>Chess</h3>
-                <p>A fully functional chess game with multiplayer support.<br>Built using:</p>
-                <div class="tech-tags">
-                    <span class="tag">HTML</span>
-                    <span class="tag">CSS</span>
-                    <span class="tag">JavaScript</span>
-                    <span class="tag">Coming Soon</span>
-                </div>
-                <a href="#" class="project-link">In Progress</a>
-            </div>
-            <!-- <div class="project-card">
-                <div class="project-icon">
-                    <i class="fas fa-project-diagram"></i>
-                </div>
-                <h3>Not Decided</h3>
-                <p>Will let you know shortly.<br>Built using:</p>
-                <div class="tech-tags">
-                    <span class="tag">Coming Soon</span>
-                </div>
-                <a href="#" class="project-link">Not Started</a>
-            </div> -->
-        </div>
-    </section>
+                </section>
+            );
+        }
 
-    <section id="certificates">
-        <h2 class="section-title">Certificates</h2>
-        <div class="certificates-grid">
-            <div class="certificate-card">
-                <div class="certificate-icon">
-                    <i class="fas fa-certificate"></i>
-                </div>
-                <h3>Yantra Central Hackathon</h3>
-                <p>Earned certification from the Office of Students' Welfare for participating in the Yantra Central Hackathon.<br>Issued: Feb 2025</p>
-                <div class="certificate-image">
-                    <img src="Anivesh_Gupta_certificate.png" alt="Yantra Central Hackathon Certificate">
-                </div>
-            </div>
-            <div class="certificate-card">
-                <div class="certificate-icon">
-                    <i class="fas fa-certificate"></i>
-                </div>
-                <h3>Web Development Workshop</h3>
-                <p>Certified by Alpha Intern for participating in Winter Domination Web Development Workshop.<br>Issued: Mar 2025</p>
-                <div class="certificate-image">
-                    <img src="Anivesh Gupta Web Development Workshop Certificate.jpg" alt="Web Development Workshop Certificate">
-                </div>
-            </div>
-            <div class="certificate-card">
-                <div class="certificate-icon">
-                    <i class="fas fa-certificate"></i>
-                </div>
-                <h3 class="certificate-title">Forests and their Management</h3>
-                <p class="certificate-description">Certified by NPTEL for successfully completing the course with a consolidated score.<br>Issued: Apr 2025</p>
-                <div class="certificate-image">
-                    <img src="Anivesh Gupta Forests and their Management Certificate.jpg" alt="Forests and their Management Certificate">
-                </div>
-            </div>
-            <div class="certificate-card">
-                <div class="certificate-icon">
-                    <i class="fas fa-certificate"></i>
-                </div>
-                <h3 class="certificate-title">Data Structures and Algorithms</h3>
-                <p class="certificate-description">Certified by Infosys Springboard for successfully completing the course.<br>Issued: May 2025</p>
-                <div class="certificate-image">
-                    <img src="Anivesh Gupta Data Structures and Algorithms Certificate.jpg" alt="Data Structures and Algorithms Certificate">
-                </div>
-            </div>
-            <div class="certificate-card">
-                <div class="certificate-icon">
-                    <i class="fas fa-certificate"></i>
-                </div>
-                <h3 class="certificate-title">Cyber Security Job Simulation</h3>
-                <p class="certificate-description">Certified by Deloitte and Forage for completing practical tasks in cybersecurity.<br>Issued: Jun 2025</p>
-                <div class="certificate-image">
-                    <img src="Anivesh Gupta Cyber Security Certificate.jpg" alt="Cyber Security Certificate">
-                </div>
-            </div>
-            <div class="certificate-card">
-                <div class="certificate-icon">
-                    <i class="fas fa-certificate"></i>
-                </div>
-                <h3 class="certificate-title">Data Science BootCamp</h3>
-                <p class="certificate-description">Certified for completing a 6-week Data Science BootCamp on analytics and ML.<br>Issued: Jul 2025</p>
-                <div class="certificate-image">
-                    <img src="Anivesh gupta Data Science BootCamp Certificate.jpg" alt="Data Science BootCamp Certificate">
-                </div>
-            </div>
-            <div class="certificate-card">
-                <div class="certificate-icon">
-                    <i class="fas fa-certificate"></i>
-                </div>
-                <h3 class="certificate-title">Oracle Cloud Infrastructure 2025 AI Foundations Associate</h3>
-                <p class="certificate-description">Certified by Oracle for successfully completing the course.<br>Issued: Sep 2025</p>
-                <div class="certificate-image">
-                    <img src="Anivesh gupta Oracle Cloud Infrastructure 2025 AI Foundations Associate Certificate.jpg" alt="Data Science BootCamp Certificate">
-                </div>
-            </div>
-        </div>
-    </section>
+        // Skills Component
+        function Skills() {
+            const highLevelSkills = [
+                { name: "Python", progress: 83 },
+                { name: "Calculus (MATLAB)", progress: 82 },
+                { name: "Structured and Object-Oriented Programming (C/C++)", progress: 91 },
+                { name: "Java", progress: 88 },
+                { name: "Data Structures and Algorithms", progress: 88 },
+                { name: "FRONTEND (HTML/CSS/JAVASCRIPT)", progress: 82 },
+                { name: "Design and Analysis of Algorithms", progress: 78 },
+                { name: "Probability and Statistics (R)", progress: 97 },
+                { name: "Database Systems (Oracle)", progress: 0 },
+                { name: "Operating Systems", progress: 0 },
+                { name: "Compiler Design (Lex/Ycc)", progress: 0 },
+                { name: "Computer Networks", progress: 0 }
+            ];
 
-    <section id="resume">
-        <h2 class="section-title">Resume</h2>
-        <div class="resume-container">
-            <div class="resume-card">
-                <div class="resume-icon">
-                    <i class="fas fa-file-alt"></i>
+            const lowLevelSkills = [
+                { name: "Digital Systems Design (ModelSim)", progress: 75 },
+                { name: "Microprocessors and Microcontrollers (Keil uVision5)", progress: 92 }
+            ];
+
+            return (
+                <section id="skills">
+                    <h2 className="section-title">Skills</h2>
+                    <div className="skills-container">
+                        <div className="skills-bar">
+                            <h3 className="section-title">High-Level Languages</h3>
+                            {highLevelSkills.map((skill, index) => (
+                                <div className="skill" key={index}>
+                                    <span className="skill-name">{skill.name}</span>
+                                    <div className="progress-bar">
+                                        <div className="progress" style={{ width: `${skill.progress}%` }} data-width={`${skill.progress}%`}></div>
+                                        <span className="progress-text">{skill.progress}%</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="skills-bar">
+                            <h3 className="section-title">Low-Level Languages</h3>
+                            {lowLevelSkills.map((skill, index) => (
+                                <div className="skill" key={index}>
+                                    <span className="skill-name">{skill.name}</span>
+                                    <div className="progress-bar">
+                                        <div className="progress" style={{ width: `${skill.progress}%` }} data-width={`${skill.progress}%`}></div>
+                                        <span className="progress-text">{skill.progress}%</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        // Projects Component
+        function Projects() {
+            const projects = [
+                {
+                    icon: "fa-shopping-bag",
+                    title: "VTrade",
+                    description: "A virtual window shopping experience that lets users browse products without purchasing.",
+                    tech: ["HTML", "CSS", "JavaScript", "Tailwind-CSS"],
+                    link: "https://aniveshguptaofficial.github.io/VTrade/",
+                    linkText: "View Project"
+                },
+                {
+                    icon: "fa-book",
+                    title: "Books4MU",
+                    description: "A platform to access and share university book resources.",
+                    tech: ["HTML", "CSS", "JavaScript", "Coming Soon"],
+                    link: "https://aniveshguptaofficial.github.io/Books-For-My-University/",
+                    linkText: "In Progress"
+                },
+                {
+                    icon: "fa-chess",
+                    title: "Chess",
+                    description: "A fully functional chess game with multiplayer support.",
+                    tech: ["HTML", "CSS", "JavaScript", "Coming Soon"],
+                    link: "#",
+                    linkText: "In Progress"
+                }
+            ];
+
+            return (
+                <section id="projects">
+                    <h2 className="section-title">Projects</h2>
+                    <div className="project-grid">
+                        {projects.map((project, index) => (
+                            <div className="project-card" key={index}>
+                                <div className="project-icon">
+                                    <i className={`fas ${project.icon}`}></i>
+                                </div>
+                                <h3>{project.title}</h3>
+                                <p>{project.description}<br />Built using:</p>
+                                <div className="tech-tags">
+                                    {project.tech.map((tag, idx) => (
+                                        <span className="tag" key={idx}>{tag}</span>
+                                    ))}
+                                </div>
+                                <a href={project.link} className="project-link">{project.linkText}</a>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            );
+        }
+
+        // Reports Component
+        function Reports() {
+            const reports = [
+                {
+                    title: "Caste-Based Politics",
+                    description: "A detailed analysis of how caste influences political mobilization, representation, and governance in India. This case study explores key thinkers like B.R. Ambedkar and M.N. Srinivas, examining caste identity, alliances, and reservation policies. It highlights the dual impact—promoting representation for marginalized groups while deepening social divisions.",
+                    tech: "Sociological Analysis, Political Frameworks, Policy Review",
+                    completed: "October 2025",
+                    pdf: "Caste Based Politics.pdf"
+                },
+                {
+                    title: "Human-Computer Interaction (HCI) and Linguistics",
+                    description: "This study explores the role of language in designing intuitive and culturally adaptive user interfaces. It investigates key areas such as Natural Language Processing (NLP), voice-activated systems, multimodal interaction, and cross-language usability. The research emphasizes the integration of linguistic principles to enhance user experience, accessibility, and inclusivity in digital environments.",
+                    tech: "NLP, AI, IoT, AR/VR, Neuralink, Multimodal Systems",
+                    completed: "October 2025",
+                    pdf: "HCI_Linguistics_Report.pdf"
+                },
+                {
+                    title: "Robotics For Engineers",
+                    description: "A comprehensive report on extra-curricular activities completed under the course 'Robotics For Engineers' for the Fall Semester 2024-2025. The report includes technical workshops, study modules, and practical sessions such as Arduino Made Easy, RPI Fundamentals, Fusion 360, NLP and Robotic Systems, Control Systems with PID, and Prototyping with PCBs. It demonstrates active participation and hands-on learning across robotics, programming, and simulation tools.",
+                    tech: "Arduino, Raspberry Pi, Fusion 360, MATLAB, Python, ANSYS, PCB Design, NLP",
+                    completed: "April 2025",
+                    pdf: "Robotics For Engineers Report.pdf"
+                },
+                {
+                    title: "Smart Inventory Management System",
+                    description: "This project presents an automated inventory management system designed for small retail businesses. It leverages C and data structures like linked lists and binary search trees (BST) to efficiently manage stock, enable quick item searches, and provide low-stock alerts. The system minimizes manual errors and enhances operational efficiency through a simple, lightweight console-based interface.",
+                    tech: "C, GCC Compiler, Visual Studio Code, Linked Lists, Binary Search Trees (BST)",
+                    completed: "April 2025",
+                    pdf: "Smart Inventory Management System.pdf"
+                },
+                {
+                    title: "Strategic Supply Chain Network Optimization Using Quantum Algorithms",
+                    description: "A detailed analysis of quantum computing applications in supply chain management. This case study explores the use of quantum algorithms to solve NP-hard optimization problems in global supply chains, including facility location, routing, supplier allocation, multi-objective trade-offs, and scalable designs, with comparisons between quantum-inspired and true quantum methods.",
+                    tech: "QAOA, Quantum Annealing, QUBO, Hybrid Quantum-Classical Frameworks, VQE, QML, Digital Twins",
+                    completed: "October 2025",
+                    pdf: "Strategic supply chain network optimization using Quantum Algorithm.pdf"
+                },
+                {
+                    title: "Bank Branch Networking",
+                    description: "A detailed case study on designing a secure and efficient computer network for a bank with 25 branches across Tamil Nadu. The project involves subnetting using IPv4, implementing OSPF as the routing protocol, and establishing VPN tunnels for encrypted inter-branch communication. It also covers flow and congestion control, application-layer services, and future-proofing strategies through IPv6 migration and scalable network architecture.",
+                    tech: "Cisco Packet Tracer, IPv4 Subnetting, OSPF, VPN (IPsec), TCP Flow & Congestion Control, Dual-Stack IPv6",
+                    completed: "October 2025",
+                    pdf: "Bank Branch Networking.pdf"
+                },
+                {
+                    title: "Example Case Study Title",
+                    description: "A detailed analysis of [topic]. This case study explores [brief description].",
+                    tech: "[list if applicable]",
+                    completed: "[date]",
+                    pdf: ""
+                }
+            ];
+
+            return (
+                <section id="reports">
+                    <h2 className="section-title">Reports & Case Studies</h2>
+                    <div className="reports-grid">
+                        {reports.map((report, index) => (
+                            <div className="report-card" key={index}>
+                                <div className="report-icon">
+                                    <i className="fas fa-file-alt"></i>
+                                </div>
+                                <h3>{report.title}</h3>
+                                <p>{report.description}<br /><strong>Technologies/Tools:</strong> {report.tech}<br /><strong>Completed:</strong> {report.completed}</p>
+                                <a href="#" className="report-link" data-pdf={report.pdf}>View Report</a>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="pdf-viewer-container">
+                        <div className="pdf-viewer">
+                            <iframe id="pdf-frame" src="" width="100%" height="600px" style={{ display: 'none' }}></iframe>
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        // Certificates Component
+        function Certificates() {
+            const certificates = [
+                {
+                    title: "Yantra Central Hackathon",
+                    description: "Earned certification from the Office of Students' Welfare for participating in the Yantra Central Hackathon.",
+                    issued: "Feb 2025",
+                    image: "Anivesh_Gupta_certificate.png"
+                },
+                {
+                    title: "Web Development Workshop",
+                    description: "Certified by Alpha Intern for participating in Winter Domination Web Development Workshop.",
+                    issued: "Mar 2025",
+                    image: "Anivesh Gupta Web Development Workshop Certificate.jpg"
+                },
+                {
+                    title: "Forests and their Management",
+                    description: "Certified by NPTEL for successfully completing the course with a consolidated score.",
+                    issued: "Apr 2025",
+                    image: "Anivesh Gupta Forests and their Management Certificate.jpg"
+                },
+                {
+                    title: "Data Structures and Algorithms",
+                    description: "Certified by Infosys Springboard for successfully completing the course.",
+                    issued: "May 2025",
+                    image: "Anivesh Gupta Data Structures and Algorithms Certificate.jpg"
+                },
+                {
+                    title: "Cyber Security Job Simulation",
+                    description: "Certified by Deloitte and Forage for completing practical tasks in cybersecurity.",
+                    issued: "Jun 2025",
+                    image: "Anivesh Gupta Cyber Security Certificate.jpg"
+                },
+                {
+                    title: "Data Science BootCamp",
+                    description: "Certified for completing a 6-week Data Science BootCamp on analytics and ML.",
+                    issued: "Jul 2025",
+                    image: "Anivesh gupta Data Science BootCamp Certificate.jpg"
+                },
+                {
+                    title: "Oracle Cloud Infrastructure 2025 AI Foundations Associate",
+                    description: "Certified by Oracle for successfully completing the course.",
+                    issued: "Sep 2025",
+                    image: "Anivesh gupta Oracle Cloud Infrastructure 2025 AI Foundations Associate Certificate.jpg"
+                }
+            ];
+
+            return (
+                <section id="certificates">
+                    <h2 className="section-title">Certificates</h2>
+                    <div className="certificates-grid">
+                        {certificates.map((certificate, index) => (
+                            <div className="certificate-card" key={index}>
+                                <div className="certificate-icon">
+                                    <i className="fas fa-certificate"></i>
+                                </div>
+                                <h3 className="certificate-title">{certificate.title}</h3>
+                                <p className="certificate-description">{certificate.description}<br />Issued: {certificate.issued}</p>
+                                <div className="certificate-image">
+                                    <img src={certificate.image} alt={`${certificate.title} Certificate`} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </section>
+            );
+        }
+
+        // Resume Component
+        function Resume() {
+            return (
+                <section id="resume">
+                    <h2 className="section-title">Resume</h2>
+                    <div className="resume-container">
+                        <div className="resume-card">
+                            <div className="resume-icon">
+                                <i className="fas fa-file-alt"></i>
+                            </div>
+                            <h3>My Resume</h3>
+                            <p>View or download my professional resume to learn more about my skills, experience, and achievements.<br />Updated: September 2025</p>
+                            <div className="resume-pdf">
+                                <iframe src="Resume.pdf" width="100%" height="500px"></iframe>
+                            </div>
+                            <a href="Resume.pdf" download className="resume-link">Download Resume</a>
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        // Contact Component
+        function Contact() {
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                alert("Thank you for your message! I'll get back to you soon.");
+                e.target.reset();
+            };
+
+            return (
+                <section id="contact">
+                    <h2 className="section-title">Contact Me</h2>
+                    <form className="contact-form" onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <input type="text" placeholder="Name" required />
+                        </div>
+                        <div className="form-group">
+                            <input type="email" placeholder="Email" required />
+                        </div>
+                        <div className="form-group">
+                            <textarea rows="5" placeholder="Message" required></textarea>
+                        </div>
+                        <button type="submit">Send Message</button>
+                    </form>
+                </section>
+            );
+        }
+
+        // Footer Component
+        function Footer() {
+            const socialLinks = [
+                { href: "https://twitter.com/yourcompany", icon: "fa-twitter" },
+                { href: "https://www.linkedin.com/in/aniveshgupta/", icon: "fa-linkedin" },
+                { href: "https://github.com/AniveshGuptaOfficial", icon: "fa-github" },
+                { href: "https://www.facebook.com/Anivesh.GuptaJi", icon: "fa-facebook" },
+                { href: "https://www.instagram.com/_its_me_aniveshgupta_official", icon: "fa-instagram" },
+                { href: "mailto:aniveshgupta13579@gmail.com", icon: "fas fa-envelope" },
+                { href: "https://api.whatsapp.com/send/?phone=916289028044&text&type=phone_number&app_absent=0", icon: "fa-whatsapp" }
+            ];
+
+            return (
+                <footer>
+                    <p>Connect with me:</p>
+                    <div style={{ marginTop: '1rem' }}>
+                        {socialLinks.map((link, index) => (
+                            <a href={link.href} key={index}>
+                                <i className={`fab ${link.icon}`}></i>
+                            </a>
+                        ))}
+                    </div>
+                    <p>Copyright &copy; 2024 by Anivesh Gupta | All rights reserved.</p>
+                    <p>Made with &heartsuit; by Anivesh Gupta</p>
+                </footer>
+            );
+        }
+
+        // Main App Component
+        function App() {
+            React.useEffect(() => {
+                // Smooth scrolling for nav links
+                document.querySelectorAll('nav a').forEach(anchor => {
+                    anchor.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const section = document.querySelector(this.getAttribute('href'));
+                        section.scrollIntoView({ behavior: 'smooth' });
+                    });
+                });
+
+                // Animate skills bars on scroll
+                const skills = document.querySelectorAll('.progress');
+                const animateSkills = () => {
+                    skills.forEach(skill => {
+                        const rect = skill.getBoundingClientRect();
+                        if (rect.top <= window.innerHeight - 50) {
+                            skill.style.width = skill.getAttribute('data-width');
+                        }
+                    });
+                };
+
+                // Set initial widths to 0
+                skills.forEach(skill => {
+                    skill.setAttribute('data-width', skill.style.width);
+                    skill.style.width = '0%';
+                });
+
+                window.addEventListener('scroll', animateSkills);
+                window.addEventListener('load', animateSkills);
+
+                // Sticky nav effect
+                const nav = document.querySelector('nav');
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 50) {
+                        nav.style.background = 'rgba(255, 255, 255, 1)';
+                    } else {
+                        nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                    }
+                });
+
+                // Certificate and Resume image click handler
+                document.querySelectorAll('.certificate-image img, .resume-image img').forEach(img => {
+                    img.addEventListener('click', () => {
+                        const fullScreenDiv = document.createElement('div');
+                        fullScreenDiv.style.cssText = `
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background: rgba(0, 0, 0, 0.9);
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            z-index: 2000;
+                        `;
+
+                        const fullImg = document.createElement('img');
+                        fullImg.src = img.src;
+                        fullImg.style.cssText = `
+                            max-width: 90%;
+                            max-height: 90%;
+                            border-radius: 10px;
+                            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+                        `;
+
+                        fullScreenDiv.appendChild(fullImg);
+                        document.body.appendChild(fullScreenDiv);
+
+                        fullScreenDiv.addEventListener('click', () => {
+                            document.body.removeChild(fullScreenDiv);
+                        });
+                    });
+                });
+
+                // Resume download link
+                document.querySelectorAll('.resume-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const pdfUrl = e.currentTarget.href;
+                        window.open(pdfUrl, '_blank');
+                    });
+                });
+
+                // Report PDF viewer functionality
+                document.querySelectorAll('.report-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const pdfPath = this.getAttribute('data-pdf');
+                        const pdfFrame = document.getElementById('pdf-frame');
+                        if (pdfPath && pdfPath !== '') {
+                            pdfFrame.src = pdfPath;
+                            pdfFrame.style.display = 'block';
+                            document.querySelector('.pdf-viewer-container').scrollIntoView({ behavior: 'smooth' });
+                        } else {
+                            pdfFrame.style.display = 'none';
+                            alert('PDF not available yet!');
+                        }
+                    });
+                });
+
+                // Hide PDF frame on load
+                document.getElementById('pdf-frame').style.display = 'none';
+
+                // Cleanup event listeners on unmount
+                return () => {
+                    window.removeEventListener('scroll', animateSkills);
+                    window.removeEventListener('load', animateSkills);
+                };
+            }, []);
+
+            return (
+                <div>
+                    <Header />
+                    <Nav />
+                    <About />
+                    <Skills />
+                    <Projects />
+                    <Reports />
+                    <Certificates />
+                    <Resume />
+                    <Contact />
+                    <Footer />
                 </div>
-                <h3>My Resume</h3>
-                <p>View or download my professional resume to learn more about my skills, experience, and achievements.<br>Updated: September 2025</p>
-                <div class="resume-pdf">
-                    <iframe src="Resume.pdf" width="100%" height="500px"></iframe>
-                </div>
-                <a href="Resume.pdf" download class="resume-link">Download Resume</a>
-            </div>
-        </div>
-    </section>
+            );
+        }
 
-
-    <section id="contact">
-        <h2 class="section-title">Contact Me</h2>
-        <form class="contact-form">
-            <div class="form-group">
-                <input type="text" placeholder="Name" required>
-            </div>
-            <div class="form-group">
-                <input type="email" placeholder="Email" required>
-            </div>
-            <div class="form-group">
-                <textarea rows="5" placeholder="Message" required></textarea>
-            </div>
-            <button type="submit">Send Message</button>
-        </form>
-    </section>
-
-    <footer>
-        <p>Connect with me:</p>
-        <div style="margin-top: 1rem;">
-            <a href="https://twitter.com/yourcompany"><i class="fab fa-twitter"></i></a>
-            <a href="https://www.linkedin.com/in/aniveshgupta/"><i class="fab fa-linkedin"></i></a>
-            <a href="https://github.com/AniveshGuptaOfficial"><i class="fab fa-github"></i></a>
-            <a href="https://www.facebook.com/Anivesh.GuptaJi"><i class="fab fa-facebook"></i></a>
-            <a href="https://www.instagram.com/_its_me_aniveshgupta_official"><i class="fab fa-instagram"></i></a>
-            <a href="mailto:aniveshgupta13579@gmail.com"><i class="fas fa-envelope"></i></a>
-            <a href="https://api.whatsapp.com/send/?phone=916289028044&text&type=phone_number&app_absent=0"><i class="fab fa-whatsapp"></i></a>
-        </div>
-        <p>Copyright &copy; 2024 by Anivesh Gupta | All rights reserved.</p>
-        <p>Made with &heartsuit; by Anivesh Gupta</p>
-    </footer>
+        // Render the App
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
 </body>
 </html>
