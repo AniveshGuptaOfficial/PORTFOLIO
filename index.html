@@ -41,12 +41,22 @@
                 { href: "#contact", label: "Contact" }
             ];
 
+            const toggleMenu = () => {
+                const menu = document.querySelector('.nav-menu');
+                menu.classList.toggle('active');
+            };
+
             return (
-                <nav>
-                    <ul>
+                <nav className="nav-container">
+                    <div className="hamburger" onClick={toggleMenu}>
+                        <span className="bar"></span>
+                        <span className="bar"></span>
+                        <span className="bar"></span>
+                    </div>
+                    <ul className="nav-menu">
                         {navItems.map((item, index) => (
                             <li key={index}>
-                                <a href={item.href}>{item.label}</a>
+                                <a href={item.href} onClick={toggleMenu}>{item.label}</a>
                             </li>
                         ))}
                     </ul>
