@@ -102,22 +102,12 @@
         function Skills() {
             const highLevelSkills = [
                 { name: "Python", progress: 83 },
-                { name: "Calculus (MATLAB)", progress: 82 },
                 { name: "Structured and Object-Oriented Programming (C/C++)", progress: 91 },
                 { name: "Java", progress: 88 },
                 { name: "Data Structures and Algorithms", progress: 88 },
                 { name: "FRONTEND (HTML/CSS/JAVASCRIPT)", progress: 82 },
                 { name: "Design and Analysis of Algorithms", progress: 78 },
-                { name: "Probability and Statistics (R)", progress: 97 },
-                { name: "Database Systems (Oracle)", progress: 0 },
-                { name: "Operating Systems", progress: 0 },
-                { name: "Compiler Design (Lex/Ycc)", progress: 0 },
-                { name: "Computer Networks", progress: 0 }
-            ];
-
-            const lowLevelSkills = [
-                { name: "Digital Systems Design (ModelSim)", progress: 75 },
-                { name: "Microprocessors and Microcontrollers (Keil uVision5)", progress: 92 }
+                { name: "Database Systems (Oracle SQL)", progress: 0 }
             ];
 
             return (
@@ -125,20 +115,7 @@
                     <h2 className="section-title">Skills</h2>
                     <div className="skills-container">
                         <div className="skills-bar">
-                            <h3 className="section-title">High-Level Languages</h3>
                             {highLevelSkills.map((skill, index) => (
-                                <div className="skill" key={index}>
-                                    <span className="skill-name">{skill.name}</span>
-                                    <div className="progress-bar">
-                                        <div className="progress" style={{ width: `${skill.progress}%` }} data-width={`${skill.progress}%`}></div>
-                                        <span className="progress-text">{skill.progress}%</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="skills-bar">
-                            <h3 className="section-title">Low-Level Languages</h3>
-                            {lowLevelSkills.map((skill, index) => (
                                 <div className="skill" key={index}>
                                     <span className="skill-name">{skill.name}</span>
                                     <div className="progress-bar">
@@ -335,6 +312,12 @@
                     description: "Certified by Oracle for successfully completing the course.",
                     issued: "Sep 2025",
                     image: "Anivesh gupta Oracle Cloud Infrastructure 2025 AI Foundations Associate Certificate.jpg"
+                },
+                {
+                    title: "Wild Life Ecology",
+                    description: "Certified by NPTEL for successfully completing the course with a consolidated score.",
+                    issued: "Oct 2025",
+                    image: "Anivesh Gupta Wild Life Ecology Certificate.jpg"
                 }
             ];
 
