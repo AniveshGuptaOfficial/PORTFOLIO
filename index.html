@@ -6,7 +6,7 @@
     <title>Anivesh Gupta</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.3/babel.min.js"></script>
@@ -14,17 +14,30 @@
 <body>
     <div id="root"></div>
     <script type="text/babel">
+
         // Header Component
         function Header() {
             return (
                 <header className="header-container">
+                    <div className="header-noise"></div>
+                    <div className="header-grid-lines"></div>
                     <div className="header-content">
-                        <img src="Anivesh Gupta.jpg" alt="Anivesh Gupta" className="profile-img" />
+                        <div className="profile-wrap">
+                            <div className="profile-ring"></div>
+                            <img src="Anivesh Gupta.jpg" alt="Anivesh Gupta" className="profile-img" />
+                        </div>
                         <div className="header-right">
-                            <h1>Anivesh Gupta</h1>
-                            <p>Web Developer & Designer</p>
+                            <span className="header-tag">Portfolio 2025</span>
+                            <h1>Anivesh<br /><em>Gupta</em></h1>
+                            <p className="header-subtitle">Web Developer <span className="amp">&</span> Designer</p>
+                            <div className="header-badges">
+                                <span className="badge"><i className="fas fa-map-marker-alt"></i> VIT Vellore</span>
+                                <span className="badge"><i className="fas fa-code"></i> Full-Stack</span>
+                                <span className="badge"><i className="fas fa-brain"></i> ML / AI</span>
+                            </div>
                         </div>
                     </div>
+                    <div className="scroll-hint">scroll <i className="fas fa-arrow-down"></i></div>
                 </header>
             );
         }
@@ -35,28 +48,26 @@
                 { href: "#about", label: "About" },
                 { href: "#skills", label: "Skills" },
                 { href: "#projects", label: "Projects" },
-                { href: "#reports", label: "Reports & Case Studies" },
-                { href: "#certificates", label: "Certificates" },
+                { href: "#reports", label: "Reports" },
+                { href: "#certificates", label: "Certs" },
                 { href: "#resume", label: "Resume" },
                 { href: "#contact", label: "Contact" }
             ];
 
-            const toggleMenu = () => {
-                const menu = document.querySelector('.nav-menu');
-                menu.classList.toggle('active');
-            };
+            const [open, setOpen] = React.useState(false);
+
+            const close = () => setOpen(false);
 
             return (
-                <nav className="nav-container">
-                    <div className="hamburger" onClick={toggleMenu}>
-                        <span className="bar"></span>
-                        <span className="bar"></span>
-                        <span className="bar"></span>
-                    </div>
-                    <ul className="nav-menu">
+                <nav className={`nav-container ${open ? 'nav-open' : ''}`}>
+                    <div className="nav-logo">AG</div>
+                    <button className="hamburger" onClick={() => setOpen(!open)} aria-label="Toggle menu">
+                        <span></span><span></span><span></span>
+                    </button>
+                    <ul className={`nav-menu ${open ? 'active' : ''}`}>
                         {navItems.map((item, index) => (
                             <li key={index}>
-                                <a href={item.href} onClick={toggleMenu}>{item.label}</a>
+                                <a href={item.href} onClick={close}>{item.label}</a>
                             </li>
                         ))}
                     </ul>
@@ -66,31 +77,56 @@
 
         // About Component
         function About() {
+            const education = [
+                {
+                    image: "national-high-school-cbse.jpeg",
+                    alt: "NHS CBSE",
+                    school: "National High School — CBSE",
+                    period: "2009 – 2021",
+                    detail: "Completed 10th grade with an overall percentage of 68.2%."
+                },
+                {
+                    image: "national-high-school-wbbse.jpeg",
+                    alt: "NHS WBBSE",
+                    school: "National High School — WBBSE",
+                    period: "2021 – 2023",
+                    detail: "Completed 12th grade with an overall percentage of 71.8%."
+                },
+                {
+                    image: "Vellore-institute-of-technology.jpg",
+                    alt: "VIT",
+                    school: "Vellore Institute of Technology",
+                    period: "2023 – 2027",
+                    detail: "Currently in 5th semester with an overall CGPA of 7.88."
+                }
+            ];
+
             return (
-                <section id="about">
-                    <h2 className="section-title">About Me</h2>
-                    <div className="about-container">
-                        <div className="about-box">
-                            <p>Hi, I'm Anivesh Gupta, a passionate web developer and designer with a keen interest in behavioral alignment in social interactions, technology acceptance, and empirical evaluations of learning systems. Currently pursuing my studies at VIT Vellore, I have a strong foundation in programming, logic, and computational problem-solving. I enjoy working on real-world projects and continuously expanding my technical expertise.</p>
-                            <div className="about-container about-gap">
-                                <div className="about-box">
-                                    <img src="national-high-school-cbse.jpeg" alt="NHS CBSE" className="profile-img" />
-                                    <h3>National High School - CBSE</h3>
-                                    <h3>[ 2009 - 2021 ]</h3>
-                                    <p>Completed education till 10th grade with an overall percentage of 68.2%.</p>
-                                </div>
-                                <div className="about-box">
-                                    <img src="national-high-school-wbbse.jpeg" alt="NHS WBBSE" className="profile-img" />
-                                    <h3>National High School - WBBSE</h3>
-                                    <h3>[ 2021 - 2023 ]</h3>
-                                    <p>Completed education till 12th grade with an overall percentage of 71.8%.</p>
-                                </div>
-                                <div className="about-box">
-                                    <img src="Vellore-institute-of-technology.jpg" alt="VIT" className="profile-img" />
-                                    <h3>Vellore Institute of Technology</h3>
-                                    <h3>[ 2023 - 2027 ]</h3>
-                                    <p>Currently in 5th semester with an overall CGPA of 7.88.</p>
-                                </div>
+                <section id="about" className="section-reveal">
+                    <div className="section-header">
+                        <span className="section-num">01</span>
+                        <h2 className="section-title">About Me</h2>
+                    </div>
+                    <div className="about-layout">
+                        <div className="about-bio">
+                            <p>Hi, I'm <strong>Anivesh Gupta</strong> — a passionate web developer and designer with a keen interest in behavioral alignment in social interactions, technology acceptance, and empirical evaluations of learning systems.</p>
+                            <p>Currently pursuing my studies at <strong>VIT Vellore</strong>, I have a strong foundation in programming, logic, and computational problem-solving. I enjoy working on real-world projects and continuously expanding my technical expertise.</p>
+                        </div>
+                        <div className="edu-timeline">
+                            <h3 className="edu-heading">Education</h3>
+                            <div className="edu-cards">
+                                {education.map((edu, i) => (
+                                    <div className="edu-card" key={i}>
+                                        <div className="edu-img-wrap">
+                                            <img src={edu.image} alt={edu.alt} />
+                                        </div>
+                                        <div className="edu-info">
+                                            <h4>{edu.school}</h4>
+                                            <span className="edu-period">{edu.period}</span>
+                                            <p>{edu.detail}</p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -101,30 +137,37 @@
         // Skills Component
         function Skills() {
             const highLevelSkills = [
-                { name: "Python", progress: 83 },
-                { name: "Structured and Object-Oriented Programming (C/C++)", progress: 91 },
+                { name: "Database Systems (Oracle SQL)", progress: 92 },
+                { name: "Structured & Object-Oriented Programming (C/C++)", progress: 91 },
                 { name: "Java", progress: 88 },
                 { name: "Data Structures and Algorithms", progress: 88 },
-                { name: "FRONTEND (HTML/CSS/JAVASCRIPT)", progress: 82 },
-                { name: "Design and Analysis of Algorithms", progress: 78 },
-                { name: "Database Systems (Oracle SQL)", progress: 92 }
+                { name: "Python", progress: 83 },
+                { name: "Frontend (HTML / CSS / JavaScript)", progress: 82 },
+                { name: "Design and Analysis of Algorithms", progress: 78 }
             ];
 
             return (
-                <section id="skills">
-                    <h2 className="section-title">Skills</h2>
-                    <div className="skills-container">
-                        <div className="skills-bar">
-                            {highLevelSkills.map((skill, index) => (
-                                <div className="skill" key={index}>
+                <section id="skills" className="section-reveal section-alt">
+                    <div className="section-header">
+                        <span className="section-num">02</span>
+                        <h2 className="section-title">Skills</h2>
+                    </div>
+                    <div className="skills-wrap">
+                        {highLevelSkills.map((skill, index) => (
+                            <div className="skill-row" key={index}>
+                                <div className="skill-label">
                                     <span className="skill-name">{skill.name}</span>
-                                    <div className="progress-bar">
-                                        <div className="progress" style={{ width: `${skill.progress}%` }} data-width={`${skill.progress}%`}></div>
-                                        <span className="progress-text">{skill.progress}%</span>
-                                    </div>
+                                    <span className="skill-pct">{skill.progress}%</span>
                                 </div>
-                            ))}
-                        </div>
+                                <div className="progress-track">
+                                    <div
+                                        className="progress-fill"
+                                        style={{ width: `${skill.progress}%` }}
+                                        data-width={`${skill.progress}%`}
+                                    ></div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </section>
             );
@@ -137,53 +180,66 @@
                     icon: "fa-shopping-bag",
                     title: "VTrade",
                     description: "A virtual window shopping experience that lets users browse products without purchasing.",
-                    tech: ["HTML ", "CSS ", "JavaScript ", "Tailwind-CSS "],
+                    tech: ["HTML", "CSS", "JavaScript", "Tailwind CSS"],
                     link: "https://aniveshguptaofficial.github.io/VTrade/",
-                    linkText: "View Project"
+                    linkText: "View Project",
+                    status: "live"
                 },
                 {
                     icon: "fa-book",
                     title: "Books4MU",
                     description: "A platform to access and share university book resources.",
-                    tech: ["HTML ", "CSS ", "JavaScript ", "Coming Soon "],
+                    tech: ["HTML", "CSS", "JavaScript"],
                     link: "https://aniveshguptaofficial.github.io/Books-For-My-University/",
-                    linkText: "In Progress"
+                    linkText: "In Progress",
+                    status: "wip"
                 },
                 {
                     icon: "fa-hand-paper",
-                    title: "Real-Time Sign Language Recognition System",
+                    title: "Real-Time Sign Language Recognition",
                     description: "An intelligent real-time hand gesture recognition system that converts sign language into text and speech using MediaPipe and an SVM (RBF kernel) classifier.",
-                    tech: ["Python ", "OpenCV ", "MediaPipe ", "NumPy ", "Pandas ", "Scikit-learn(SVM) ", "Pyttsx3"],
+                    tech: ["Python", "OpenCV", "MediaPipe", "NumPy", "Pandas", "Scikit-learn (SVM)", "Pyttsx3"],
                     link: "https://github.com/AniveshGuptaOfficial/Real-Time-Sign-Language-Recognition-System",
-                    linkText: "View on GitHub"
+                    linkText: "View on GitHub",
+                    status: "live"
                 },
                 {
                     icon: "fa-chess",
                     title: "Chess",
                     description: "A fully functional chess game with multiplayer support.",
-                    tech: ["HTML ", "CSS ", "JavaScript ", "Coming Soon "],
+                    tech: ["HTML", "CSS", "JavaScript"],
                     link: "#",
-                    linkText: "In Progress"
+                    linkText: "In Progress",
+                    status: "wip"
                 }
             ];
 
             return (
-                <section id="projects">
-                    <h2 className="section-title">Projects</h2>
+                <section id="projects" className="section-reveal">
+                    <div className="section-header">
+                        <span className="section-num">03</span>
+                        <h2 className="section-title">Projects</h2>
+                    </div>
                     <div className="project-grid">
                         {projects.map((project, index) => (
                             <div className="project-card" key={index}>
-                                <div className="project-icon">
-                                    <i className={`fas ${project.icon}`}></i>
+                                <div className="project-top">
+                                    <div className="project-icon">
+                                        <i className={`fas ${project.icon}`}></i>
+                                    </div>
+                                    {project.status === 'wip' && <span className="wip-badge">WIP</span>}
+                                    {project.status === 'live' && <span className="live-badge">Live</span>}
                                 </div>
                                 <h3>{project.title}</h3>
-                                <p>{project.description}<br />Built using:</p>
+                                <p>{project.description}</p>
                                 <div className="tech-tags">
                                     {project.tech.map((tag, idx) => (
                                         <span className="tag" key={idx}>{tag}</span>
                                     ))}
                                 </div>
-                                <a href={project.link} className="project-link">{project.linkText}</a>
+                                <a href={project.link} className="project-link" target="_blank" rel="noopener noreferrer">
+                                    {project.linkText} <i className="fas fa-arrow-right"></i>
+                                </a>
                             </div>
                         ))}
                     </div>
@@ -196,80 +252,80 @@
             const reports = [
                 {
                     title: "Caste-Based Politics",
-                    description: "A detailed analysis of how caste influences political mobilization, representation, and governance in India. This case study explores key thinkers like B.R. Ambedkar and M.N. Srinivas, examining caste identity, alliances, and reservation policies. It highlights the dual impact—promoting representation for marginalized groups while deepening social divisions.",
+                    description: "A detailed analysis of how caste influences political mobilization, representation, and governance in India. Explores key thinkers like B.R. Ambedkar and M.N. Srinivas, examining caste identity, alliances, and reservation policies.",
                     tech: "Sociological Analysis, Political Frameworks, Policy Review",
                     completed: "October 2025",
                     pdf: "Caste Based Politics.pdf"
                 },
                 {
-                    title: "Human-Computer Interaction (HCI) and Linguistics",
-                    description: "This study explores the role of language in designing intuitive and culturally adaptive user interfaces. It investigates key areas such as Natural Language Processing (NLP), voice-activated systems, multimodal interaction, and cross-language usability. The research emphasizes the integration of linguistic principles to enhance user experience, accessibility, and inclusivity in digital environments.",
+                    title: "Human-Computer Interaction & Linguistics",
+                    description: "Explores the role of language in designing intuitive and culturally adaptive user interfaces, investigating NLP, voice-activated systems, multimodal interaction, and cross-language usability.",
                     tech: "NLP, AI, IoT, AR/VR, Neuralink, Multimodal Systems",
                     completed: "October 2025",
                     pdf: "HCI_Linguistics_Report.pdf"
                 },
                 {
                     title: "Robotics For Engineers",
-                    description: "A comprehensive report on extra-curricular activities completed under the course 'Robotics For Engineers' for the Fall Semester 2024-2025. The report includes technical workshops, study modules, and practical sessions such as Arduino Made Easy, RPI Fundamentals, Fusion 360, NLP and Robotic Systems, Control Systems with PID, and Prototyping with PCBs. It demonstrates active participation and hands-on learning across robotics, programming, and simulation tools.",
+                    description: "A comprehensive report on extra-curricular activities completed under 'Robotics For Engineers'. Includes Arduino, RPI Fundamentals, Fusion 360, NLP, PID Control Systems, and PCB Prototyping.",
                     tech: "Arduino, Raspberry Pi, Fusion 360, MATLAB, Python, ANSYS, PCB Design, NLP",
                     completed: "April 2025",
                     pdf: "Robotics For Engineers Report.pdf"
                 },
                 {
                     title: "Smart Inventory Management System",
-                    description: "This project presents an automated inventory management system designed for small retail businesses. It leverages C and data structures like linked lists and binary search trees (BST) to efficiently manage stock, enable quick item searches, and provide low-stock alerts. The system minimizes manual errors and enhances operational efficiency through a simple, lightweight console-based interface.",
-                    tech: "C, GCC Compiler, Visual Studio Code, Linked Lists, Binary Search Trees (BST)",
+                    description: "An automated inventory management system for small retail businesses leveraging C and data structures like linked lists and BSTs to manage stock and provide low-stock alerts.",
+                    tech: "C, GCC Compiler, Visual Studio Code, Linked Lists, Binary Search Trees",
                     completed: "April 2025",
                     pdf: "Smart Inventory Management System.pdf"
                 },
                 {
-                    title: "Strategic Supply Chain Network Optimization Using Quantum Algorithms",
-                    description: "A detailed analysis of quantum computing applications in supply chain management. This case study explores the use of quantum algorithms to solve NP-hard optimization problems in global supply chains, including facility location, routing, supplier allocation, multi-objective trade-offs, and scalable designs, with comparisons between quantum-inspired and true quantum methods.",
+                    title: "Quantum Supply Chain Optimization",
+                    description: "A detailed analysis of quantum computing applications in supply chain management, exploring quantum algorithms to solve NP-hard optimization problems in global supply chains.",
                     tech: "QAOA, Quantum Annealing, QUBO, Hybrid Quantum-Classical Frameworks, VQE, QML, Digital Twins",
                     completed: "October 2025",
                     pdf: "Strategic supply chain network optimization using Quantum Algorithm.pdf"
                 },
                 {
                     title: "Bank Branch Networking",
-                    description: "A detailed case study on designing a secure and efficient computer network for a bank with 25 branches across Tamil Nadu. The project involves subnetting using IPv4, implementing OSPF as the routing protocol, and establishing VPN tunnels for encrypted inter-branch communication. It also covers flow and congestion control, application-layer services, and future-proofing strategies through IPv6 migration and scalable network architecture.",
-                    tech: "Cisco Packet Tracer, IPv4 Subnetting, OSPF, VPN (IPsec), TCP Flow & Congestion Control, Dual-Stack IPv6",
+                    description: "A case study on designing a secure and efficient computer network for a bank with 25 branches across Tamil Nadu, using IPv4 subnetting, OSPF routing, and VPN tunnels.",
+                    tech: "Cisco Packet Tracer, IPv4 Subnetting, OSPF, VPN (IPsec), TCP, Dual-Stack IPv6",
                     completed: "October 2025",
                     pdf: "Bank Branch Networking.pdf"
                 },
                 {
-                    title: "Impact of Operating System Choices on DevOps Practices",
-                    description: "A comprehensive case study analyzing how operating system selection influences DevOps workflows such as CI/CD, automation, and containerization. The project highlights the transition of a technology organization from a mixed OS environment to a Linux-based ecosystem, evaluating improvements in build performance, deployment frequency, and infrastructure automation. It emphasizes Linux’s role in enhancing reliability, tool integration, and scalability within modern DevOps pipelines.",
+                    title: "OS Choices & DevOps Practices",
+                    description: "A case study analyzing how OS selection influences DevOps workflows — CI/CD, automation, containerization — highlighting a transition to Linux-based infrastructure.",
                     tech: "Linux, Windows Server, Jenkins, GitLab CI, Docker, Kubernetes, Ansible, Terraform, Puppet",
                     completed: "November 2025",
                     pdf: "The Impact of Operating System Choices on DevOps Practices.pdf"
-                }//,
-                // {
-                //     title: "Example Case Study Title",
-                //     description: "A detailed analysis of [topic]. This case study explores [brief description].",
-                //     tech: "[list if applicable]",
-                //     completed: "[date]",
-                //     pdf: ""
-                // }
+                }
             ];
 
             return (
-                <section id="reports">
-                    <h2 className="section-title">Reports & Case Studies</h2>
+                <section id="reports" className="section-reveal section-alt">
+                    <div className="section-header">
+                        <span className="section-num">04</span>
+                        <h2 className="section-title">Reports & Case Studies</h2>
+                    </div>
                     <div className="reports-grid">
                         {reports.map((report, index) => (
                             <div className="report-card" key={index}>
-                                <div className="report-icon">
-                                    <i className="fas fa-file-alt"></i>
-                                </div>
+                                <div className="report-num">0{index + 1}</div>
                                 <h3>{report.title}</h3>
-                                <p>{report.description}<br /><strong>Technologies/Tools:</strong> {report.tech}<br /><strong>Completed:</strong> {report.completed}</p>
-                                <a href="#" className="report-link" data-pdf={report.pdf}>View Report</a>
+                                <p>{report.description}</p>
+                                <div className="report-meta">
+                                    <span><i className="fas fa-tools"></i> {report.tech}</span>
+                                    <span><i className="fas fa-calendar-alt"></i> {report.completed}</span>
+                                </div>
+                                <a href="#" className="report-link" data-pdf={report.pdf}>
+                                    View Report <i className="fas fa-file-pdf"></i>
+                                </a>
                             </div>
                         ))}
                     </div>
                     <div className="pdf-viewer-container">
                         <div className="pdf-viewer">
-                            <iframe id="pdf-frame" src="" width="100%" height="600px" style={{ display: 'none' }}></iframe>
+                            <iframe id="pdf-frame" src="" width="100%" height="600px" style={{ display: 'none', border: 'none' }}></iframe>
                         </div>
                     </div>
                 </section>
@@ -316,8 +372,8 @@
                     image: "Anivesh gupta Data Science BootCamp Certificate.jpg"
                 },
                 {
-                    title: "Oracle Cloud Infrastructure 2025 AI Foundations Associate",
-                    description: "Certified by Oracle for successfully completing the course.",
+                    title: "Oracle Cloud Infrastructure 2025 AI Foundations",
+                    description: "Certified by Oracle for successfully completing the AI Foundations Associate course.",
                     issued: "Sep 2025",
                     image: "Anivesh gupta Oracle Cloud Infrastructure 2025 AI Foundations Associate Certificate.jpg"
                 },
@@ -330,18 +386,24 @@
             ];
 
             return (
-                <section id="certificates">
-                    <h2 className="section-title">Certificates</h2>
+                <section id="certificates" className="section-reveal">
+                    <div className="section-header">
+                        <span className="section-num">05</span>
+                        <h2 className="section-title">Certificates</h2>
+                    </div>
                     <div className="certificates-grid">
                         {certificates.map((certificate, index) => (
                             <div className="certificate-card" key={index}>
-                                <div className="certificate-icon">
-                                    <i className="fas fa-certificate"></i>
-                                </div>
-                                <h3 className="certificate-title">{certificate.title}</h3>
-                                <p className="certificate-description">{certificate.description}<br />Issued: {certificate.issued}</p>
-                                <div className="certificate-image">
+                                <div className="cert-image-wrap">
                                     <img src={certificate.image} alt={`${certificate.title} Certificate`} />
+                                    <div className="cert-overlay">
+                                        <i className="fas fa-expand"></i>
+                                    </div>
+                                </div>
+                                <div className="cert-body">
+                                    <span className="cert-date">{certificate.issued}</span>
+                                    <h3>{certificate.title}</h3>
+                                    <p>{certificate.description}</p>
                                 </div>
                             </div>
                         ))}
@@ -353,19 +415,25 @@
         // Resume Component
         function Resume() {
             return (
-                <section id="resume">
-                    <h2 className="section-title">Resume</h2>
-                    <div className="resume-container">
-                        <div className="resume-card">
-                            <div className="resume-icon">
+                <section id="resume" className="section-reveal section-alt">
+                    <div className="section-header">
+                        <span className="section-num">06</span>
+                        <h2 className="section-title">Resume</h2>
+                    </div>
+                    <div className="resume-wrapper">
+                        <div className="resume-info">
+                            <div className="resume-icon-wrap">
                                 <i className="fas fa-file-alt"></i>
                             </div>
                             <h3>My Resume</h3>
-                            <p>View or download my professional resume to learn more about my skills, experience, and achievements.<br />Updated: September 2025</p>
-                            <div className="resume-pdf">
-                                <iframe src="Resume.pdf" width="100%" height="500px"></iframe>
-                            </div>
-                            <a href="Resume.pdf" download className="resume-link">Download Resume</a>
+                            <p>View or download my professional resume to learn more about my skills, experience, and achievements.</p>
+                            <p className="resume-updated"><i className="fas fa-sync-alt"></i> Updated: September 2025</p>
+                            <a href="Resume.pdf" download className="resume-dl-btn">
+                                <i className="fas fa-download"></i> Download PDF
+                            </a>
+                        </div>
+                        <div className="resume-preview">
+                            <iframe src="Resume.pdf" width="100%" height="500px" style={{ border: 'none', borderRadius: '12px' }}></iframe>
                         </div>
                     </div>
                 </section>
@@ -381,20 +449,37 @@
             };
 
             return (
-                <section id="contact">
-                    <h2 className="section-title">Contact Me</h2>
-                    <form className="contact-form" onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <input type="text" placeholder="Name" required />
+                <section id="contact" className="section-reveal">
+                    <div className="section-header">
+                        <span className="section-num">07</span>
+                        <h2 className="section-title">Contact Me</h2>
+                    </div>
+                    <div className="contact-layout">
+                        <div className="contact-text">
+                            <h3>Let's work together.</h3>
+                            <p>Have a project in mind, a question, or just want to say hi? Drop me a message and I'll get back to you.</p>
+                            <div className="contact-links">
+                                <a href="mailto:aniveshgupta13579@gmail.com"><i className="fas fa-envelope"></i> aniveshgupta13579@gmail.com</a>
+                                <a href="https://www.linkedin.com/in/aniveshgupta/" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin"></i> linkedin.com/in/aniveshgupta</a>
+                                <a href="https://github.com/AniveshGuptaOfficial" target="_blank" rel="noopener noreferrer"><i className="fab fa-github"></i> github.com/AniveshGuptaOfficial</a>
+                            </div>
                         </div>
-                        <div className="form-group">
-                            <input type="email" placeholder="Email" required />
-                        </div>
-                        <div className="form-group">
-                            <textarea rows="5" placeholder="Message" required></textarea>
-                        </div>
-                        <button type="submit">Send Message</button>
-                    </form>
+                        <form className="contact-form" onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label>Your Name</label>
+                                <input type="text" placeholder="Rahul Sharma" required />
+                            </div>
+                            <div className="form-group">
+                                <label>Email Address</label>
+                                <input type="email" placeholder="rahul@example.com" required />
+                            </div>
+                            <div className="form-group">
+                                <label>Message</label>
+                                <textarea rows="5" placeholder="Hello Anivesh, I'd love to discuss..." required></textarea>
+                            </div>
+                            <button type="submit">Send Message <i className="fas fa-paper-plane"></i></button>
+                        </form>
+                    </div>
                 </section>
             );
         }
@@ -402,27 +487,31 @@
         // Footer Component
         function Footer() {
             const socialLinks = [
-                { href: "https://twitter.com/yourcompany", icon: "fa-twitter" },
-                { href: "https://www.linkedin.com/in/aniveshgupta/", icon: "fa-linkedin" },
-                { href: "https://github.com/AniveshGuptaOfficial", icon: "fa-github" },
-                { href: "https://www.facebook.com/Anivesh.GuptaJi", icon: "fa-facebook" },
-                { href: "https://www.instagram.com/_its_me_aniveshgupta_official", icon: "fa-instagram" },
-                { href: "mailto:aniveshgupta13579@gmail.com", icon: "fas fa-envelope" },
-                { href: "https://api.whatsapp.com/send/?phone=916289028044&text&type=phone_number&app_absent=0", icon: "fa-whatsapp" }
+                { href: "https://twitter.com/yourcompany", icon: "fa-twitter", label: "Twitter" },
+                { href: "https://www.linkedin.com/in/aniveshgupta/", icon: "fa-linkedin", label: "LinkedIn" },
+                { href: "https://github.com/AniveshGuptaOfficial", icon: "fa-github", label: "GitHub" },
+                { href: "https://www.facebook.com/Anivesh.GuptaJi", icon: "fa-facebook", label: "Facebook" },
+                { href: "https://www.instagram.com/_its_me_aniveshgupta_official", icon: "fa-instagram", label: "Instagram" },
+                { href: "mailto:aniveshgupta13579@gmail.com", icon: "fa-envelope", label: "Email" },
+                { href: "https://api.whatsapp.com/send/?phone=916289028044&text&type=phone_number&app_absent=0", icon: "fa-whatsapp", label: "WhatsApp" }
             ];
 
             return (
                 <footer>
-                    <p>Connect with me:</p>
-                    <div style={{ marginTop: '1rem' }}>
-                        {socialLinks.map((link, index) => (
-                            <a href={link.href} key={index}>
-                                <i className={`fab ${link.icon}`}></i>
-                            </a>
-                        ))}
+                    <div className="footer-inner">
+                        <div className="footer-brand">
+                            <span className="footer-logo">AG</span>
+                            <p>Anivesh Gupta — Web Developer & Designer</p>
+                        </div>
+                        <div className="footer-socials">
+                            {socialLinks.map((link, index) => (
+                                <a href={link.href} key={index} aria-label={link.label} target="_blank" rel="noopener noreferrer">
+                                    <i className={`fab ${link.icon}`}></i>
+                                </a>
+                            ))}
+                        </div>
+                        <p className="footer-copy">© 2024 Anivesh Gupta · All rights reserved · Made with ❤️</p>
                     </div>
-                    <p>Copyright &copy; 2024 by Anivesh Gupta | All rights reserved.</p>
-                    <p>Made with ❤️ by Anivesh Gupta</p>
                 </footer>
             );
         }
@@ -431,89 +520,76 @@
         function App() {
             React.useEffect(() => {
                 // Smooth scrolling for nav links
-                document.querySelectorAll('nav a').forEach(anchor => {
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                     anchor.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const section = document.querySelector(this.getAttribute('href'));
-                        section.scrollIntoView({ behavior: 'smooth' });
+                        const target = document.querySelector(this.getAttribute('href'));
+                        if (target) {
+                            e.preventDefault();
+                            target.scrollIntoView({ behavior: 'smooth' });
+                        }
                     });
                 });
 
-                // Animate skills bars on scroll
-                const skills = document.querySelectorAll('.progress');
+                // Animate skill bars on scroll
                 const animateSkills = () => {
-                    skills.forEach(skill => {
-                        const rect = skill.getBoundingClientRect();
+                    document.querySelectorAll('.progress-fill').forEach(bar => {
+                        const rect = bar.getBoundingClientRect();
                         if (rect.top <= window.innerHeight - 50) {
-                            skill.style.width = skill.getAttribute('data-width');
+                            bar.style.width = bar.getAttribute('data-width');
                         }
                     });
                 };
 
-                // Set initial widths to 0
-                skills.forEach(skill => {
-                    skill.setAttribute('data-width', skill.style.width);
-                    skill.style.width = '0%';
+                document.querySelectorAll('.progress-fill').forEach(bar => {
+                    bar.setAttribute('data-width', bar.style.width);
+                    bar.style.width = '0%';
                 });
 
-                window.addEventListener('scroll', animateSkills);
-                window.addEventListener('load', animateSkills);
+                // Section reveal on scroll
+                const revealSections = () => {
+                    document.querySelectorAll('.section-reveal').forEach(section => {
+                        const rect = section.getBoundingClientRect();
+                        if (rect.top <= window.innerHeight * 0.88) {
+                            section.classList.add('revealed');
+                        }
+                    });
+                };
 
-                // Sticky nav effect
-                const nav = document.querySelector('nav');
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 50) {
-                        nav.style.background = 'rgba(255, 255, 255, 1)';
+                // Sticky nav
+                const nav = document.querySelector('.nav-container');
+                const handleScroll = () => {
+                    animateSkills();
+                    revealSections();
+                    if (window.scrollY > 60) {
+                        nav.classList.add('nav-scrolled');
                     } else {
-                        nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                        nav.classList.remove('nav-scrolled');
                     }
-                });
+                };
 
-                // Certificate and Resume image click handler
-                document.querySelectorAll('.certificate-image img, .resume-image img').forEach(img => {
+                window.addEventListener('scroll', handleScroll);
+                revealSections();
+
+                // Certificate lightbox
+                document.querySelectorAll('.certificate-card .cert-image-wrap img').forEach(img => {
                     img.addEventListener('click', () => {
-                        const fullScreenDiv = document.createElement('div');
-                        fullScreenDiv.style.cssText = `
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background: rgba(0, 0, 0, 0.9);
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            z-index: 2000;
-                        `;
-
-                        const fullImg = document.createElement('img');
-                        fullImg.src = img.src;
-                        fullImg.style.cssText = `
-                            max-width: 90%;
-                            max-height: 90%;
-                            border-radius: 10px;
-                            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-                        `;
-
-                        fullScreenDiv.appendChild(fullImg);
-                        document.body.appendChild(fullScreenDiv);
-
-                        fullScreenDiv.addEventListener('click', () => {
-                            document.body.removeChild(fullScreenDiv);
-                        });
+                        const overlay = document.createElement('div');
+                        overlay.className = 'lightbox-overlay';
+                        const imgEl = document.createElement('img');
+                        imgEl.src = img.src;
+                        const close = document.createElement('button');
+                        close.className = 'lightbox-close';
+                        close.innerHTML = '&times;';
+                        overlay.appendChild(imgEl);
+                        overlay.appendChild(close);
+                        document.body.appendChild(overlay);
+                        const dismiss = () => document.body.removeChild(overlay);
+                        overlay.addEventListener('click', (e) => { if (e.target === overlay) dismiss(); });
+                        close.addEventListener('click', dismiss);
                     });
                 });
 
-                // Resume download link
-                document.querySelectorAll('.resume-link').forEach(link => {
-                    link.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        const pdfUrl = e.currentTarget.href;
-                        window.open(pdfUrl, '_blank');
-                    });
-                });
-
-                // Report PDF viewer functionality
+                // Report PDF viewer
                 document.querySelectorAll('.report-link').forEach(link => {
                     link.addEventListener('click', function(e) {
                         e.preventDefault();
@@ -530,14 +606,9 @@
                     });
                 });
 
-                // Hide PDF frame on load
                 document.getElementById('pdf-frame').style.display = 'none';
 
-                // Cleanup event listeners on unmount
-                return () => {
-                    window.removeEventListener('scroll', animateSkills);
-                    window.removeEventListener('load', animateSkills);
-                };
+                return () => window.removeEventListener('scroll', handleScroll);
             }, []);
 
             return (
@@ -556,7 +627,6 @@
             );
         }
 
-        // Render the App
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
