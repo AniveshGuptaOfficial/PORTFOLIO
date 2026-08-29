@@ -1,651 +1,1200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anivesh Gupta</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.3/babel.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anivesh Gupta — Portfolio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.3/babel.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d0d0f;--surface:#141417;--surface2:#1b1b20;
+      --border:rgba(255,255,255,0.07);
+      --accent:#a78bfa;--accent2:#7c3aed;--accent-g:rgba(167,139,250,0.14);
+      --text:#e8e8ef;--muted:#8a8a9a;--white:#ffffff;
+      --r:14px;--r-lg:20px;
+      /* ambient canvas tint in dark mode */
+      --ambient-color:#a78bfa;
+    }
+    /* Light mode token overrides */
+    :root.light{
+      --bg:#f5f4f9;--surface:#ffffff;--surface2:#ede9fb;
+      --border:rgba(0,0,0,0.09);
+      --accent:#7c3aed;--accent2:#5b21b6;--accent-g:rgba(124,58,237,0.1);
+      --text:#1a1a2e;--muted:#6b6b80;--white:#1a1a2e;
+      --ambient-color:#7c3aed;
+    }
+    /* Smooth theme transition on everything except canvas/animation */
+    body,header,.topnav,.breadcrumb,.site-footer,section,
+    .project-card,.report-card,.cert-card,.edu-card,
+    .contact-form,.resume-info,.resume-preview,
+    .pdf-wrap,.pg,.view-page,.view-page-inner{
+      transition:background-color .35s ease,border-color .35s ease,color .35s ease;
+    }
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7;overflow-x:hidden;min-height:100vh}
+
+    /* ── SPA shell ── */
+    #spa-root{display:flex;flex-direction:column;height:100vh;overflow:hidden;position:relative;z-index:1}
+    .view-stage{position:relative;flex:1;overflow:hidden;min-height:0}
+    .view-page{position:absolute;inset:0;overflow:hidden;background:var(--bg);will-change:transform,opacity}
+    .view-page-inner{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+    /* ── Page transition animations ── */
+    @keyframes inRight {from{transform:translateX(60px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+    @keyframes inLeft  {from{transform:translateX(-60px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+    @keyframes outLeft {from{transform:none;opacity:1}to{transform:translateX(-40px) scale(.97);opacity:0}}
+    @keyframes outRight{from{transform:none;opacity:1}to{transform:translateX(40px) scale(.97);opacity:0}}
+    .enter-right{animation:inRight .42s cubic-bezier(.16,1,.3,1) forwards}
+    .enter-left {animation:inLeft  .42s cubic-bezier(.16,1,.3,1) forwards}
+    .exit-left  {animation:outLeft .28s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
+    .exit-right {animation:outRight.28s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
+
+    /* ── Top progress bar ── */
+    .pg-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent2),var(--accent));z-index:99999;pointer-events:none;transition:width .3s ease}
+
+    /* ── Topnav ── */
+    .topnav{background:rgba(13,13,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:.8rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;z-index:900;flex-shrink:0;position:relative;transition:background .3s,box-shadow .3s}
+    .topnav.scrolled{background:rgba(13,13,15,.97);box-shadow:0 4px 30px rgba(0,0,0,.4)}
+    .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--accent);cursor:pointer;text-shadow:0 0 18px rgba(167,139,250,.4);flex-shrink:0}
+    .theme-toggle{background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:all .25s;flex-shrink:0}
+    .theme-toggle:hover{color:var(--accent);border-color:rgba(167,139,250,.4);background:var(--accent-g)}
+    :root.light .theme-toggle{background:var(--surface2);color:var(--accent)}
+    .nav-links{display:flex;gap:.2rem;flex-wrap:wrap;justify-content:flex-end}
+    .nav-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.87rem;padding:.45rem .85rem;border-radius:100px;transition:all .25s;font-weight:400}
+    .nav-btn:hover{color:var(--white);background:rgba(255,255,255,.07)}
+    .nav-btn.active{color:var(--accent);background:rgba(167,139,250,.1)}
+    .hamburger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px}
+    .hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
+    .mob-menu{display:none;position:fixed;top:0;left:0;right:0;background:rgba(13,13,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);border-bottom:1px solid var(--border);flex-direction:column;padding:.75rem;z-index:950;margin-top:54px}
+    .mob-menu.open{display:flex}
+    .mob-menu .nav-btn{text-align:left;border-radius:10px;padding:.65rem 1rem}
+
+    /* ── Breadcrumb ── */
+    .breadcrumb{background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 2rem;display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--muted);flex-shrink:0;position:relative;z-index:900}
+    .bc-home{cursor:pointer;color:var(--accent)}
+    .bc-home:hover{text-decoration:underline}
+    .bc-sep{opacity:.4}
+    .bc-cur{color:var(--text);font-weight:500}
+
+    /* ── Side dot nav ── */
+    .sidenav{position:fixed;right:1.25rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:.55rem;z-index:800}
+    .sdot{width:6px;height:6px;border-radius:50%;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.35);cursor:pointer;transition:background .25s,transform .25s}
+    .sdot:hover,.sdot.active{background:var(--accent);transform:scale(1.6)}
+
+    /* ── Page wrapper ── */
+    .pg{max-width:1200px;margin:0 auto;padding:3.5rem 2rem 5rem}
+    .pg.wide{max-width:1300px}
+
+    /* ── Section header ── */
+    .sh{display:flex;align-items:baseline;gap:1rem;margin-bottom:3rem}
+    .sh-num{font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;color:var(--accent);opacity:.55;letter-spacing:.1em}
+    .sh-title{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,4vw,2.5rem);font-weight:800;letter-spacing:-.03em;color:var(--white);position:relative}
+    .sh-title::after{content:'';position:absolute;bottom:-6px;left:0;width:2.5rem;height:3px;background:var(--accent);border-radius:2px}
+
+    /* ════ HERO ════ */
+    .hero{position:relative;min-height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 50% 0%,#1e0a3c 0%,var(--bg) 70%)}
+    :root.light .hero{background:radial-gradient(ellipse 80% 60% at 50% 0%,#ede9fb 0%,var(--bg) 70%)}
+    .hero-canvas{position:absolute;inset:0;width:100%!important;height:100%!important;z-index:0;pointer-events:none}
+    .hero-vignette{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 70% 55% at 50% 50%,transparent 30%,rgba(13,13,15,.55) 100%),linear-gradient(to bottom,transparent 60%,rgba(13,13,15,.95) 100%)}
+    .hero-inner{position:relative;z-index:2;display:flex;align-items:center;gap:4rem;padding:3rem 2rem;animation:fadeUp .9s ease both}
+    .profile-wrap{position:relative;flex-shrink:0}
+    .profile-ring{position:absolute;inset:-8px;border-radius:50%;background:conic-gradient(var(--accent),var(--accent2),var(--accent));animation:spin 8s linear infinite;opacity:.6}
+    .profile-ring::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--bg)}
+    .profile-img{width:200px;height:200px;border-radius:50%;object-fit:cover;position:relative;z-index:1}
+    .hero-tag{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.6rem;font-weight:400}
+    .hero h1{font-family:'Syne',sans-serif;font-size:clamp(3rem,7vw,5.5rem);font-weight:800;line-height:.95;letter-spacing:-.03em;color:var(--white)}
+    .hero h1 em{font-style:italic;color:var(--accent);font-weight:600}
+    .hero-sub{font-size:1.1rem;color:var(--muted);margin-top:1rem;font-weight:300}
+    .hero-sub .amp{color:var(--accent);font-style:italic}
+    .hero-badges{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.5rem}
+    .badge{background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.25);color:var(--accent);font-size:.78rem;padding:.35rem .85rem;border-radius:100px;font-weight:400}
+    .badge i{margin-right:.35rem}
+    .hero-cta{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem}
+    .hero-cta-btn{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.28);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;padding:.5rem 1.15rem;border-radius:100px;cursor:pointer;transition:background .25s,border-color .25s,color .25s}
+    .hero-cta-btn:hover{background:var(--accent2);border-color:var(--accent2);color:#fff}
+    .scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:var(--muted);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;z-index:2;animation:pulseY 2s ease infinite;cursor:pointer}
+
+    /* ════ ABOUT ════ */
+    .about-layout{display:grid;grid-template-columns:1fr 1.6fr;gap:4rem;align-items:start}
+    .about-bio p{color:var(--muted);font-size:1.05rem;margin-bottom:1.2rem;line-height:1.8}
+    .about-bio strong{color:var(--text);font-weight:500}
+    .edu-heading{font-family:'Syne',sans-serif;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:1.2rem;font-weight:600}
+    .edu-cards{display:flex;flex-direction:column;gap:1rem}
+    .edu-card{display:flex;align-items:center;gap:1.25rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;transition:border-color .3s,transform .3s}
+    .edu-card:hover{border-color:rgba(167,139,250,.3);transform:translateX(4px)}
+    .edu-img{width:54px;height:54px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--surface)}
+    .edu-img img{width:100%;height:100%;object-fit:cover}
+    .edu-info h4{font-family:'Syne',sans-serif;font-weight:700;font-size:.93rem;color:var(--white);margin-bottom:.15rem}
+    .edu-period{font-size:.75rem;color:var(--accent);display:block;margin-bottom:.25rem;letter-spacing:.04em}
+    .edu-info p{font-size:.83rem;color:var(--muted);line-height:1.5}
+
+    /* ════ SKILLS ════ */
+    .skills-wrap{display:flex;flex-direction:column;gap:1.5rem}
+    .skill-label{display:flex;justify-content:space-between;margin-bottom:.45rem}
+    .skill-name{font-size:.9rem;color:var(--text)}
+    .skill-pct{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:700;color:var(--accent)}
+    .progress-track{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;width:0;transition:width 1.2s cubic-bezier(.16,1,.3,1);box-shadow:0 0 10px rgba(167,139,250,.3)}
+
+    /* ════ PROJECTS ════ */
+    .project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem}
+    .project-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:2rem;display:flex;flex-direction:column;gap:.85rem;transition:border-color .3s,transform .35s,box-shadow .35s}
+    .project-card:hover{border-color:rgba(167,139,250,.35);transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,0,0,.4),0 0 0 1px rgba(167,139,250,.1)}
+    .project-top{display:flex;justify-content:space-between;align-items:center}
+    .project-icon{width:44px;height:44px;background:var(--accent-g);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:var(--accent)}
+    .wip-badge{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .65rem;border-radius:100px;background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.25)}
+    .live-badge{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.25rem .65rem;border-radius:100px;background:rgba(52,211,153,.1);color:#34d399;border:1px solid rgba(52,211,153,.25)}
+    .project-card h3{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:var(--white)}
+    .project-card>p{font-size:.88rem;color:var(--muted);line-height:1.7;flex:1}
+    .tech-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+    .tag{font-size:.72rem;padding:.25rem .65rem;background:var(--surface2);border:1px solid var(--border);border-radius:100px;color:var(--muted)}
+    .project-link{display:inline-flex;align-items:center;gap:.45rem;color:var(--accent);text-decoration:none;font-size:.85rem;font-weight:500;transition:gap .2s;margin-top:auto}
+    .project-link:hover{gap:.7rem}
+
+    /* ════ REPORTS ════ */
+    .reports-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem}
+    .report-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:2rem;display:flex;flex-direction:column;gap:.85rem;transition:border-color .3s,transform .3s}
+    .report-card:hover{border-color:rgba(167,139,250,.3);transform:translateY(-4px)}
+    .report-num{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:rgba(167,139,250,.18);line-height:1}
+    .report-card h3{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;color:var(--white);line-height:1.3}
+    .report-card>p{font-size:.86rem;color:var(--muted);line-height:1.7;flex:1}
+    .report-meta{display:flex;flex-direction:column;gap:.3rem;font-size:.78rem;color:var(--muted)}
+    .report-meta span{display:flex;align-items:flex-start;gap:.5rem;line-height:1.5}
+    .report-meta i{color:var(--accent);flex-shrink:0;margin-top:.15rem;font-size:.7rem}
+    .report-btn{display:inline-flex;align-items:center;gap:.45rem;background:var(--accent-g);border:1px solid rgba(167,139,250,.25);color:var(--accent);font-size:.82rem;font-weight:500;padding:.55rem 1.1rem;border-radius:100px;text-decoration:none;transition:background .25s;align-self:flex-start;margin-top:auto;cursor:pointer;font-family:'DM Sans',sans-serif}
+    .report-btn:hover{background:rgba(167,139,250,.22)}
+    .pdf-wrap{margin-top:2.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+
+    /* ════ CERTS ════ */
+    .certs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem}
+    .cert-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .3s,transform .3s}
+    .cert-card:hover{border-color:rgba(167,139,250,.3);transform:translateY(-5px)}
+    .cert-img-wrap{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--surface2);cursor:pointer}
+    .cert-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+    .cert-img-wrap:hover img{transform:scale(1.04)}
+    .cert-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;color:white;font-size:1.4rem;opacity:0;transition:opacity .3s}
+    .cert-img-wrap:hover .cert-overlay{opacity:1}
+    .cert-body{padding:1.2rem 1.4rem}
+    .cert-date{font-size:.7rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;font-weight:500;display:block;margin-bottom:.35rem}
+    .cert-body h3{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--white);margin-bottom:.35rem;line-height:1.3}
+    .cert-body p{font-size:.8rem;color:var(--muted);line-height:1.6}
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.93);display:flex;align-items:center;justify-content:center;z-index:9999;animation:fadeIn .2s ease}
+    .lightbox img{max-width:90vw;max-height:88vh;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+    .lb-close{position:absolute;top:1.5rem;right:1.5rem;background:rgba(255,255,255,.1);border:none;color:white;width:44px;height:44px;border-radius:50%;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+    .lb-close:hover{background:rgba(255,255,255,.2)}
+
+    /* ════ RESUME ════ */
+    .resume-wrap{display:grid;grid-template-columns:280px 1fr;gap:3rem;align-items:start}
+    .resume-info{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:2rem;display:flex;flex-direction:column;gap:1rem;text-align:center}
+    .resume-icon{width:58px;height:58px;background:var(--accent-g);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--accent);margin:0 auto}
+    .resume-info h3{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:700;color:var(--white)}
+    .resume-info p{font-size:.88rem;color:var(--muted);line-height:1.6}
+    .resume-updated{font-size:.75rem!important;color:var(--accent)!important}
+    .resume-dl{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;background:var(--accent2);color:white;font-size:.88rem;font-weight:500;padding:.75rem 1.5rem;border-radius:100px;text-decoration:none;transition:background .25s,transform .25s;margin-top:.5rem}
+    .resume-dl:hover{background:#6d28d9;transform:translateY(-2px)}
+    .resume-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+    .resume-preview iframe{display:block;border:none}
+
+    /* ════ CONTACT ════ */
+    .contact-layout{display:grid;grid-template-columns:1fr 1.4fr;gap:4rem;align-items:start}
+    .contact-text h3{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--white);letter-spacing:-.03em;margin-bottom:1rem}
+    .contact-text>p{color:var(--muted);font-size:.95rem;line-height:1.8;margin-bottom:2rem}
+    .contact-links{display:flex;flex-direction:column;gap:.75rem}
+    .contact-links a{display:flex;align-items:center;gap:.75rem;color:var(--muted);text-decoration:none;font-size:.9rem;transition:color .2s}
+    .contact-links a:hover{color:var(--accent)}
+    .contact-links a i{color:var(--accent);width:18px}
+    .contact-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:2.5rem;display:flex;flex-direction:column;gap:1.25rem}
+    .form-group{display:flex;flex-direction:column;gap:.4rem}
+    .form-group label{font-size:.75rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+    input,textarea{width:100%;padding:.85rem 1rem;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.92rem;outline:none;transition:background-color .35s,border-color .25s,box-shadow .25s,color .35s}
+    input::placeholder,textarea::placeholder{color:rgba(138,138,154,.5)}
+    input:focus,textarea:focus{border-color:rgba(167,139,250,.4);box-shadow:0 0 0 3px rgba(167,139,250,.08)}
+    textarea{resize:vertical;min-height:130px}
+    .submit-btn{background:linear-gradient(135deg,var(--accent2),var(--accent));color:white;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:500;padding:.9rem 1.75rem;border:none;border-radius:100px;cursor:pointer;display:inline-flex;align-items:center;gap:.6rem;transition:opacity .25s,transform .25s;align-self:flex-start}
+    .submit-btn:hover{opacity:.88;transform:translateY(-2px)}
+
+    /* ════ FOOTER ════ */
+    /* ── Footer: rounded card, clearly separated from page content ── */
+    .site-footer{
+      background:transparent;
+      border:none;
+      padding:0 2rem 3rem;
+      margin-top:4rem;  /* clear gap from last content block */
+      position:relative;
+      z-index:1;
+    }
+    .footer-card{
+      max-width:860px;
+      margin:0 auto;
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:3rem 2.5rem 2.5rem;
+      box-shadow:0 8px 40px rgba(0,0,0,.25),
+                 0 0 0 1px rgba(167,139,250,.06) inset;
+    }
+    .footer-divider{width:80px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);margin:0 auto 2rem}
+    .footer-inner{display:flex;flex-direction:column;align-items:center;gap:1.75rem;text-align:center}
+    .footer-logo{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--accent);letter-spacing:-.02em}
+    .footer-inner>p{font-size:.85rem;color:var(--muted)}
+    .footer-socials{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;padding:.75rem 0;perspective:600px}
+
+    /* ── 3D Icon cube wrapper ── */
+    .icon3d{
+      width:64px;height:64px;
+      position:relative;
+      cursor:pointer;
+      text-decoration:none;
+      display:block;
+    }
+    /* The cube — 6 faces */
+    .icon3d-cube{
+      width:100%;height:100%;
+      position:relative;
+      transform-style:preserve-3d;
+      transition:transform .55s cubic-bezier(.34,1.56,.64,1);
+      /* idle float */
+      animation:cube3dFloat 3s ease-in-out infinite;
+    }
+    .icon3d:nth-child(even) .icon3d-cube{animation-delay:.45s}
+    .icon3d:nth-child(3n)   .icon3d-cube{animation-delay:.9s}
+    .icon3d:nth-child(4n)   .icon3d-cube{animation-delay:1.3s}
+
+    /* Hover: flip to reveal back face */
+    .icon3d:hover .icon3d-cube{
+      transform:rotateY(180deg) rotateX(-10deg) scale(1.12);
+      animation:none;
+    }
+
+    /* Face base */
+    .icon3d-face{
+      position:absolute;inset:0;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:16px;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+    }
+    /* Front face — icon on dark surface */
+    .icon3d-front{
+      background:var(--surface2);
+      border:1px solid var(--border);
+      color:var(--muted);
+      font-size:1.4rem;
+      box-shadow:0 4px 18px rgba(0,0,0,.35),
+                 0 1px 0 rgba(255,255,255,.06) inset;
+      transition:color .3s;
+    }
+    /* Back face — gradient glow */
+    .icon3d-back{
+      background:linear-gradient(135deg,var(--accent2) 0%,var(--accent) 100%);
+      color:#fff;
+      font-size:1.5rem;
+      transform:rotateY(180deg);
+      box-shadow:0 0 28px rgba(124,58,237,.55),
+                 0 4px 18px rgba(0,0,0,.4);
+    }
+    /* Side shadow illusion */
+    .icon3d-side{
+      position:absolute;inset:0;
+      border-radius:16px;
+      background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(167,139,250,.1));
+      transform:rotateY(90deg) translateZ(-2px);
+      box-shadow:6px 0 20px rgba(124,58,237,.2);
+    }
+
+    /* Entrance stagger */
+    .icon3d:nth-child(1){animation-delay:.05s}
+    .icon3d:nth-child(1) .icon3d-cube{animation-delay:.05s}
+    .icon3d:nth-child(2) .icon3d-cube{animation-delay:.15s}
+    .icon3d:nth-child(3) .icon3d-cube{animation-delay:.28s}
+    .icon3d:nth-child(4) .icon3d-cube{animation-delay:.42s}
+    .icon3d:nth-child(5) .icon3d-cube{animation-delay:.55s}
+    .icon3d:nth-child(6) .icon3d-cube{animation-delay:.68s}
+    .icon3d:nth-child(7) .icon3d-cube{animation-delay:.80s}
+
+    /* Entrance pop */
+    .icon3d-cube{animation:cube3dFloat 3s ease-in-out infinite,cube3dPop .6s cubic-bezier(.34,1.56,.64,1) both}
+
+    /* Tooltip label */
+    .icon3d::after{
+      content:attr(aria-label);
+      position:absolute;
+      bottom:-28px;left:50%;transform:translateX(-50%) translateY(4px);
+      font-size:.65rem;font-family:'DM Sans',sans-serif;font-weight:500;
+      color:var(--accent);letter-spacing:.06em;text-transform:uppercase;
+      opacity:0;white-space:nowrap;
+      transition:opacity .25s,transform .25s;
+      pointer-events:none;
+    }
+    .icon3d:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* Per-brand front-face accent color on hover */
+    .icon3d[data-brand="twitter"]:hover   .icon3d-front{color:#1da1f2;border-color:rgba(29,161,242,.35)}
+    .icon3d[data-brand="linkedin"]:hover  .icon3d-front{color:#0a66c2;border-color:rgba(10,102,194,.35)}
+    .icon3d[data-brand="github"]:hover    .icon3d-front{color:#e0e0e0;border-color:rgba(255,255,255,.25)}
+    .icon3d[data-brand="facebook"]:hover  .icon3d-front{color:#1877f2;border-color:rgba(24,119,242,.35)}
+    .icon3d[data-brand="instagram"]:hover .icon3d-front{color:#e1306c;border-color:rgba(225,48,108,.35)}
+    .icon3d[data-brand="email"]:hover     .icon3d-front{color:#a78bfa;border-color:rgba(167,139,250,.35)}
+    .icon3d[data-brand="whatsapp"]:hover  .icon3d-front{color:#25d366;border-color:rgba(37,211,102,.35)}
+
+    @keyframes cube3dPop{
+      from{opacity:0;transform:scale(.4) rotateX(40deg) rotateY(-20deg)}
+      to  {opacity:1;transform:scale(1) rotateX(0) rotateY(0)}
+    }
+    @keyframes cube3dFloat{
+      0%,100%{transform:rotateX(0deg) rotateY(0deg) translateY(0)}
+      25%    {transform:rotateX(8deg) rotateY(6deg) translateY(-4px)}
+      50%    {transform:rotateX(0deg) rotateY(-8deg) translateY(-6px)}
+      75%    {transform:rotateX(-6deg) rotateY(4deg) translateY(-3px)}
+    }
+
+    .footer-copy{font-size:.75rem;color:rgba(138,138,154,.4);padding-top:.5rem;margin-top:.5rem}
+    :root.light .footer-card{box-shadow:0 8px 40px rgba(0,0,0,.08),0 0 0 1px rgba(124,58,237,.08) inset}
+    :root.light .icon3d-front{background:#fff;border-color:rgba(0,0,0,.1);color:#6b6b80;box-shadow:0 4px 18px rgba(0,0,0,.1)}
+
+    /* ════ KEYFRAMES ════ */
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes pulseY{0%,100%{opacity:.5;transform:translateX(-50%) translateY(0)}50%{opacity:1;transform:translateX(-50%) translateY(5px)}}
+
+    /* ════ RESPONSIVE ════ */
+    @media(max-width:900px){.about-layout,.resume-wrap,.contact-layout{grid-template-columns:1fr;gap:2rem}}
+    @media(max-width:768px){
+      .hero-inner{flex-direction:column;text-align:center;gap:2rem}
+      .hero-badges,.hero-cta{justify-content:center}
+      .profile-img{width:150px;height:150px}
+      .nav-links{display:none}
+      .hamburger{display:flex}
+      .pg{padding:2rem 1.25rem 4rem}
+      .sidenav{display:none}
+    }
+    @media(max-width:480px){
+      .hero h1{font-size:2.8rem}
+      .project-grid,.reports-grid,.certs-grid{grid-template-columns:1fr}
+    }
+  </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
 
-        // Header Component
-        function Header() {
-            return (
-                <header className="header-container">
-                    <div className="header-noise"></div>
-                    <div className="header-grid-lines"></div>
-                    <div className="header-content">
-                        <div className="profile-wrap">
-                            <div className="profile-ring"></div>
-                            <img src="Anivesh Gupta.jpg" alt="Anivesh Gupta" className="profile-img" />
-                        </div>
-                        <div className="header-right">
-                            <span className="header-tag">Portfolio 2025</span>
-                            <h1>Anivesh<br /><em>Gupta</em></h1>
-                            <p className="header-subtitle">Web Developer <span className="amp">&</span> Designer</p>
-                            <div className="header-badges">
-                                <span className="badge"><i className="fas fa-map-marker-alt"></i> VIT Vellore</span>
-                                <span className="badge"><i className="fas fa-code"></i> Full-Stack</span>
-                                <span className="badge"><i className="fas fa-brain"></i> ML / AI</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="scroll-hint">scroll <i className="fas fa-arrow-down"></i></div>
-                </header>
-            );
-        }
+/* ══════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════ */
+const VIEWS = ['home','about','skills','projects','reports','certificates','resume','contact'];
+const LABELS = {home:'Home',about:'About',skills:'Skills',projects:'Projects',reports:'Reports',certificates:'Certs',resume:'Resume',contact:'Contact'};
+const NUMS   = {about:'01',skills:'02',projects:'03',reports:'04',certificates:'05',resume:'06',contact:'07'};
 
-        // Nav Component
-        function Nav() {
-            const navItems = [
-                { href: "#about", label: "About" },
-                { href: "#skills", label: "Skills" },
-                { href: "#projects", label: "Projects" },
-                { href: "#reports", label: "Reports" },
-                { href: "#certificates", label: "Certs" },
-                { href: "#resume", label: "Resume" },
-                { href: "#contact", label: "Contact" }
-            ];
+const EDUCATION = [
+  {image:"national-high-school-cbse.jpeg",alt:"NHS CBSE",school:"National High School — CBSE",period:"2009 – 2021",detail:"Completed 10th grade with an overall percentage of 68.2%."},
+  {image:"national-high-school-wbbse.jpeg",alt:"NHS WBBSE",school:"National High School — WBBSE",period:"2021 – 2023",detail:"Completed 12th grade with an overall percentage of 71.8%."},
+  {image:"Vellore-institute-of-technology.jpg",alt:"VIT",school:"Vellore Institute of Technology",period:"2023 – 2027",detail:"Currently in 7th semester with an overall CGPA of 7.85."},
+];
+const SKILLS = [
+  {name:"Database Systems (Oracle SQL)",pct:92},
+  {name:"Structured & Object-Oriented Programming (C/C++)",pct:91},
+  {name:"Java",pct:88},
+  {name:"Data Structures and Algorithms",pct:88},
+  {name:"Python",pct:83},
+  {name:"Frontend (HTML / CSS / JavaScript)",pct:82},
+  {name:"Design and Analysis of Algorithms",pct:78},
+];
+const PROJECTS = [
+  {icon:"fa-shopping-bag",title:"VTrade",description:"A virtual window shopping experience that lets users browse products without purchasing.",tech:["HTML","CSS","JavaScript","Tailwind CSS"],link:"https://aniveshguptaofficial.github.io/VTrade/",linkText:"View Project",status:"live"},
+  {icon:"fa-book",title:"Books4MU",description:"A platform to access and share university book resources.",tech:["HTML","CSS","JavaScript"],link:"https://aniveshguptaofficial.github.io/Books-For-My-University/",linkText:"In Progress",status:"wip"},
+  {icon:"fa-hand-paper",title:"Real-Time Sign Language Recognition",description:"An intelligent real-time hand gesture recognition system that converts sign language into text and speech using MediaPipe and an SVM (RBF kernel) classifier.",tech:["Python","OpenCV","MediaPipe","NumPy","Pandas","Scikit-learn (SVM)","Pyttsx3"],link:"https://github.com/AniveshGuptaOfficial/Real-Time-Sign-Language-Recognition-System",linkText:"View on GitHub",status:"live"},
+  {icon:"fa-chess",title:"Chess",description:"A fully functional chess game with multiplayer support.",tech:["HTML","CSS","JavaScript"],link:"#",linkText:"In Progress",status:"wip"},
+];
+const REPORTS = [
+  {title:"Caste-Based Politics",description:"A detailed analysis of how caste influences political mobilization, representation, and governance in India. Explores key thinkers like B.R. Ambedkar and M.N. Srinivas.",tech:"Sociological Analysis, Political Frameworks, Policy Review",completed:"October 2025",pdf:"Caste Based Politics.pdf"},
+  {title:"Human-Computer Interaction & Linguistics",description:"Explores the role of language in designing intuitive and culturally adaptive user interfaces, investigating NLP, voice-activated systems, multimodal interaction, and cross-language usability.",tech:"NLP, AI, IoT, AR/VR, Neuralink, Multimodal Systems",completed:"October 2025",pdf:"HCI_Linguistics_Report.pdf"},
+  {title:"Robotics For Engineers",description:"A comprehensive report on extra-curricular activities: Arduino, RPI Fundamentals, Fusion 360, NLP, PID Control Systems, and PCB Prototyping.",tech:"Arduino, Raspberry Pi, Fusion 360, MATLAB, Python, ANSYS, PCB Design, NLP",completed:"April 2025",pdf:"Robotics For Engineers Report.pdf"},
+  {title:"Smart Inventory Management System",description:"An automated inventory management system for small retail businesses leveraging C and data structures like linked lists and BSTs.",tech:"C, GCC Compiler, Visual Studio Code, Linked Lists, Binary Search Trees",completed:"April 2025",pdf:"Smart Inventory Management System.pdf"},
+  {title:"Quantum Supply Chain Optimization",description:"A detailed analysis of quantum computing applications in supply chain management, exploring quantum algorithms to solve NP-hard optimization problems.",tech:"QAOA, Quantum Annealing, QUBO, Hybrid Quantum-Classical Frameworks, VQE, QML",completed:"October 2025",pdf:"Strategic supply chain network optimization using Quantum Algorithm.pdf"},
+  {title:"Bank Branch Networking",description:"A case study on designing a secure and efficient computer network for a bank with 25 branches across Tamil Nadu, using IPv4 subnetting, OSPF routing, and VPN tunnels.",tech:"Cisco Packet Tracer, IPv4 Subnetting, OSPF, VPN (IPsec), TCP, Dual-Stack IPv6",completed:"October 2025",pdf:"Bank Branch Networking.pdf"},
+  {title:"OS Choices & DevOps Practices",description:"A case study analyzing how OS selection influences DevOps workflows — CI/CD, automation, containerization — highlighting a transition to Linux-based infrastructure.",tech:"Linux, Windows Server, Jenkins, GitLab CI, Docker, Kubernetes, Ansible, Terraform, Puppet",completed:"November 2025",pdf:"The Impact of Operating System Choices on DevOps Practices.pdf"},
+];
+const CERTIFICATES = [
+  {title:"Yantra Central Hackathon",description:"Earned certification from the Office of Students' Welfare for participating in the Yantra Central Hackathon.",issued:"Feb 2025",image:"Anivesh_Gupta_certificate.png"},
+  {title:"Web Development Workshop",description:"Certified by Alpha Intern for participating in Winter Domination Web Development Workshop.",issued:"Mar 2025",image:"Anivesh Gupta Web Development Workshop Certificate.jpg"},
+  {title:"Forests and their Management",description:"Certified by NPTEL for successfully completing the course with a consolidated score.",issued:"Apr 2025",image:"Anivesh Gupta Forests and their Management Certificate.jpg"},
+  {title:"Data Structures and Algorithms",description:"Certified by Infosys Springboard for successfully completing the course.",issued:"May 2025",image:"Anivesh Gupta Data Structures and Algorithms Certificate.jpg"},
+  {title:"Cyber Security Job Simulation",description:"Certified by Deloitte and Forage for completing practical tasks in cybersecurity.",issued:"Jun 2025",image:"Anivesh Gupta Cyber Security Certificate.jpg"},
+  {title:"Data Science BootCamp",description:"Certified for completing a 6-week Data Science BootCamp on analytics and ML.",issued:"Jul 2025",image:"Anivesh gupta Data Science BootCamp Certificate.jpg"},
+  {title:"Oracle Cloud Infrastructure 2025 AI Foundations",description:"Certified by Oracle for successfully completing the AI Foundations Associate course.",issued:"Sep 2025",image:"Anivesh gupta Oracle Cloud Infrastructure 2025 AI Foundations Associate Certificate.jpg"},
+  {title:"Wild Life Ecology",description:"Certified by NPTEL for successfully completing the course with a consolidated score.",issued:"Oct 2025",image:"Anivesh Gupta Wild Life Ecology Certificate.jpg"},
+  {title:"Human Computer Interaction",description:"Certified by NPTEL for successfully completing the course with a consolidated score.",issued:"Apr 2026",image:"Anivesh Gupta Human Computer Interaction Certificate.jpg"},
+  {title:"IBM Java Developer",description:"Certified by IBM & SkillUp for completing the Java Developer course on Coursera.",issued:"Jun 2026",image:"Anivesh Gupta IBM Java Developer Certificate.jpg"},
+  {title:"IBM Generative AI",description:"Certified by IBM for completing the Generative AI course offered by VIT.",issued:"July 2026",image:"Anivesh Gupta Generative AI Certificate.jpg"},
+];
+const SOCIALS = [
+  {href:"https://twitter.com/yourcompany",icon:"fa-twitter",label:"Twitter"},
+  {href:"https://www.linkedin.com/in/aniveshgupta/",icon:"fa-linkedin",label:"LinkedIn"},
+  {href:"https://github.com/AniveshGuptaOfficial",icon:"fa-github",label:"GitHub"},
+  {href:"https://www.facebook.com/Anivesh.GuptaJi",icon:"fa-facebook",label:"Facebook"},
+  {href:"https://www.instagram.com/_its_me_aniveshgupta_official",icon:"fa-instagram",label:"Instagram"},
+  {href:"mailto:aniveshgupta13579@gmail.com",icon:"fa-envelope",label:"Email"},
+  {href:"https://api.whatsapp.com/send/?phone=916289028044&text&type=phone_number&app_absent=0",icon:"fa-whatsapp",label:"WhatsApp"},
+];
 
-            const [open, setOpen] = React.useState(false);
+/* ══════════════════════════════════════════════
+   ROUTER HOOK
+══════════════════════════════════════════════ */
+function useRouter() {
+  const getView = () => { const h = window.location.hash.replace('#',''); return VIEWS.includes(h) ? h : 'home'; };
+  const [cur, setCur]  = useState(getView);
+  const [prev, setPrev]= useState(null);
+  const [dir, setDir]  = useState('right');
+  const [prog, setProg]= useState(0);
+  const [animating, setAnimating] = useState(false);
 
-            const close = () => setOpen(false);
+  const go = useCallback((to) => {
+    if (to === cur || animating) return;
+    const ci = VIEWS.indexOf(cur), ti = VIEWS.indexOf(to);
+    setDir(ti > ci ? 'right' : 'left');
+    setPrev(cur);
+    setCur(to);
+    setAnimating(true);
+    window.location.hash = to === 'home' ? '' : to;
+    setProg(40);
+    setTimeout(() => setProg(90), 200);
+    setTimeout(() => { setProg(100); }, 400);
+    setTimeout(() => { setProg(0); setAnimating(false); setPrev(null); }, 620);
+  }, [cur, animating]);
 
-            return (
-                <nav className={`nav-container ${open ? 'nav-open' : ''}`}>
-                    <div className="nav-logo">AG</div>
-                    <button className="hamburger" onClick={() => setOpen(!open)} aria-label="Toggle menu">
-                        <span></span><span></span><span></span>
-                    </button>
-                    <ul className={`nav-menu ${open ? 'active' : ''}`}>
-                        {navItems.map((item, index) => (
-                            <li key={index}>
-                                <a href={item.href} onClick={close}>{item.label}</a>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-            );
-        }
+  useEffect(() => {
+    const h = () => { const v = getView(); if (v !== cur) go(v); };
+    window.addEventListener('hashchange', h);
+    return () => window.removeEventListener('hashchange', h);
+  }, [cur, go]);
 
-        // About Component
-        function About() {
-            const education = [
-                {
-                    image: "national-high-school-cbse.jpeg",
-                    alt: "NHS CBSE",
-                    school: "National High School — CBSE",
-                    period: "2009 – 2021",
-                    detail: "Completed 10th grade with an overall percentage of 68.2%."
-                },
-                {
-                    image: "national-high-school-wbbse.jpeg",
-                    alt: "NHS WBBSE",
-                    school: "National High School — WBBSE",
-                    period: "2021 – 2023",
-                    detail: "Completed 12th grade with an overall percentage of 71.8%."
-                },
-                {
-                    image: "Vellore-institute-of-technology.jpg",
-                    alt: "VIT",
-                    school: "Vellore Institute of Technology",
-                    period: "2023 – 2027",
-                    detail: "Currently in 7th semester with an overall CGPA of 7.85."
-                }
-            ];
+  return { cur, prev, dir, prog, go, animating };
+}
 
-            return (
-                <section id="about" className="section-reveal">
-                    <div className="section-header">
-                        <span className="section-num">01</span>
-                        <h2 className="section-title">About Me</h2>
-                    </div>
-                    <div className="about-layout">
-                        <div className="about-bio">
-                            <p>Hi, I'm <strong>Anivesh Gupta</strong> — a passionate web developer and designer with a keen interest in behavioral alignment in social interactions, technology acceptance, and empirical evaluations of learning systems.</p>
-                            <p>Currently pursuing my studies at <strong>VIT Vellore</strong>, I have a strong foundation in programming, logic, and computational problem-solving. I enjoy working on real-world projects and continuously expanding my technical expertise.</p>
-                        </div>
-                        <div className="edu-timeline">
-                            <h3 className="edu-heading">Education</h3>
-                            <div className="edu-cards">
-                                {education.map((edu, i) => (
-                                    <div className="edu-card" key={i}>
-                                        <div className="edu-img-wrap">
-                                            <img src={edu.image} alt={edu.alt} />
-                                        </div>
-                                        <div className="edu-info">
-                                            <h4>{edu.school}</h4>
-                                            <span className="edu-period">{edu.period}</span>
-                                            <p>{edu.detail}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            );
-        }
+/* ══════════════════════════════════════════════
+   TOP NAV
+══════════════════════════════════════════════ */
+function useTheme() {
+  const [dark, setDark] = useState(true);
+  const toggle = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle('light', !next);
+  };
+  return { dark, toggle };
+}
 
-        // Skills Component
-        function Skills() {
-            const highLevelSkills = [
-                { name: "Database Systems (Oracle SQL)", progress: 92 },
-                { name: "Structured & Object-Oriented Programming (C/C++)", progress: 91 },
-                { name: "Java", progress: 88 },
-                { name: "Data Structures and Algorithms", progress: 88 },
-                { name: "Python", progress: 83 },
-                { name: "Frontend (HTML / CSS / JavaScript)", progress: 82 },
-                { name: "Design and Analysis of Algorithms", progress: 78 }
-            ];
+function TopNav({ cur, go }) {
+  const [mob, setMob] = useState(false);
+  const { dark, toggle } = useTheme();
+  const sections = VIEWS.filter(v => v !== 'home');
+  return (
+    <nav className="topnav">
+      <div className="nav-logo" onClick={() => { go('home'); setMob(false); }}>AG</div>
+      <div className="nav-links">
+        {sections.map(v => (
+          <button key={v} className={`nav-btn${cur===v?' active':''}`} onClick={() => go(v)}>
+            {LABELS[v]}
+          </button>
+        ))}
+      </div>
+      <button className="theme-toggle" onClick={toggle} title={dark ? 'Switch to light mode' : 'Switch to dark mode'}>
+        <i className={`fas ${dark ? 'fa-sun' : 'fa-moon'}`}/>
+      </button>
+      <button className="hamburger" onClick={() => setMob(o=>!o)} aria-label="Menu">
+        <span/><span/><span/>
+      </button>
+      <div className={`mob-menu${mob?' open':''}`}>
+        {sections.map(v => (
+          <button key={v} className={`nav-btn${cur===v?' active':''}`}
+            onClick={() => { go(v); setMob(false); }}>{LABELS[v]}</button>
+        ))}
+        <button className="nav-btn" onClick={toggle} style={{textAlign:'left'}}>
+          <i className={`fas ${dark ? 'fa-sun' : 'fa-moon'}`}/> {dark ? 'Light Mode' : 'Dark Mode'}
+        </button>
+      </div>
+    </nav>
+  );
+}
 
-            return (
-                <section id="skills" className="section-reveal section-alt">
-                    <div className="section-header">
-                        <span className="section-num">02</span>
-                        <h2 className="section-title">Skills</h2>
-                    </div>
-                    <div className="skills-wrap">
-                        {highLevelSkills.map((skill, index) => (
-                            <div className="skill-row" key={index}>
-                                <div className="skill-label">
-                                    <span className="skill-name">{skill.name}</span>
-                                    <span className="skill-pct">{skill.progress}%</span>
-                                </div>
-                                <div className="progress-track">
-                                    <div
-                                        className="progress-fill"
-                                        style={{ width: `${skill.progress}%` }}
-                                        data-width={`${skill.progress}%`}
-                                    ></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            );
-        }
+/* ══════════════════════════════════════════════
+   BREADCRUMB
+══════════════════════════════════════════════ */
+function Breadcrumb({ cur, go }) {
+  if (cur === 'home') return null;
+  return (
+    <div className="breadcrumb">
+      <span className="bc-home" onClick={() => go('home')}><i className="fas fa-home"/> Home</span>
+      <span className="bc-sep">/</span>
+      <span className="bc-cur">{LABELS[cur]}</span>
+    </div>
+  );
+}
 
-        // Projects Component
-        function Projects() {
-            const projects = [
-                {
-                    icon: "fa-shopping-bag",
-                    title: "VTrade",
-                    description: "A virtual window shopping experience that lets users browse products without purchasing.",
-                    tech: ["HTML", "CSS", "JavaScript", "Tailwind CSS"],
-                    link: "https://aniveshguptaofficial.github.io/VTrade/",
-                    linkText: "View Project",
-                    status: "live"
-                },
-                {
-                    icon: "fa-book",
-                    title: "Books4MU",
-                    description: "A platform to access and share university book resources.",
-                    tech: ["HTML", "CSS", "JavaScript"],
-                    link: "https://aniveshguptaofficial.github.io/Books-For-My-University/",
-                    linkText: "In Progress",
-                    status: "wip"
-                },
-                {
-                    icon: "fa-hand-paper",
-                    title: "Real-Time Sign Language Recognition",
-                    description: "An intelligent real-time hand gesture recognition system that converts sign language into text and speech using MediaPipe and an SVM (RBF kernel) classifier.",
-                    tech: ["Python", "OpenCV", "MediaPipe", "NumPy", "Pandas", "Scikit-learn (SVM)", "Pyttsx3"],
-                    link: "https://github.com/AniveshGuptaOfficial/Real-Time-Sign-Language-Recognition-System",
-                    linkText: "View on GitHub",
-                    status: "live"
-                },
-                {
-                    icon: "fa-chess",
-                    title: "Chess",
-                    description: "A fully functional chess game with multiplayer support.",
-                    tech: ["HTML", "CSS", "JavaScript"],
-                    link: "#",
-                    linkText: "In Progress",
-                    status: "wip"
-                }
-            ];
+/* ══════════════════════════════════════════════
+   SIDE DOTS
+══════════════════════════════════════════════ */
+function SideNav({ cur, go }) {
+  if (cur === 'home') return null;
+  const sections = VIEWS.filter(v => v !== 'home');
+  return (
+    <div className="sidenav">
+      {sections.map(v => (
+        <div key={v} title={LABELS[v]}
+          className={`sdot${cur===v?' active':''}`}
+          onClick={() => go(v)}/>
+      ))}
+    </div>
+  );
+}
 
-            return (
-                <section id="projects" className="section-reveal">
-                    <div className="section-header">
-                        <span className="section-num">03</span>
-                        <h2 className="section-title">Projects</h2>
-                    </div>
-                    <div className="project-grid">
-                        {projects.map((project, index) => (
-                            <div className="project-card" key={index}>
-                                <div className="project-top">
-                                    <div className="project-icon">
-                                        <i className={`fas ${project.icon}`}></i>
-                                    </div>
-                                    {project.status === 'wip' && <span className="wip-badge">WIP</span>}
-                                    {project.status === 'live' && <span className="live-badge">Live</span>}
-                                </div>
-                                <h3>{project.title}</h3>
-                                <p>{project.description}</p>
-                                <div className="tech-tags">
-                                    {project.tech.map((tag, idx) => (
-                                        <span className="tag" key={idx}>{tag}</span>
-                                    ))}
-                                </div>
-                                <a href={project.link} className="project-link" target="_blank" rel="noopener noreferrer">
-                                    {project.linkText} <i className="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            );
-        }
+/* ══════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════ */
+function Footer() {
+  // Map icon to fa prefix (some are 'fas' not 'fab')
+  const getPrefix = (icon) => icon === 'fa-envelope' ? 'fas' : 'fab';
+  const getBrand  = (label) => label.toLowerCase();
 
-        // Reports Component
-        function Reports() {
-            const reports = [
-                {
-                    title: "Caste-Based Politics",
-                    description: "A detailed analysis of how caste influences political mobilization, representation, and governance in India. Explores key thinkers like B.R. Ambedkar and M.N. Srinivas, examining caste identity, alliances, and reservation policies.",
-                    tech: "Sociological Analysis, Political Frameworks, Policy Review",
-                    completed: "October 2025",
-                    pdf: "Caste Based Politics.pdf"
-                },
-                {
-                    title: "Human-Computer Interaction & Linguistics",
-                    description: "Explores the role of language in designing intuitive and culturally adaptive user interfaces, investigating NLP, voice-activated systems, multimodal interaction, and cross-language usability.",
-                    tech: "NLP, AI, IoT, AR/VR, Neuralink, Multimodal Systems",
-                    completed: "October 2025",
-                    pdf: "HCI_Linguistics_Report.pdf"
-                },
-                {
-                    title: "Robotics For Engineers",
-                    description: "A comprehensive report on extra-curricular activities completed under 'Robotics For Engineers'. Includes Arduino, RPI Fundamentals, Fusion 360, NLP, PID Control Systems, and PCB Prototyping.",
-                    tech: "Arduino, Raspberry Pi, Fusion 360, MATLAB, Python, ANSYS, PCB Design, NLP",
-                    completed: "April 2025",
-                    pdf: "Robotics For Engineers Report.pdf"
-                },
-                {
-                    title: "Smart Inventory Management System",
-                    description: "An automated inventory management system for small retail businesses leveraging C and data structures like linked lists and BSTs to manage stock and provide low-stock alerts.",
-                    tech: "C, GCC Compiler, Visual Studio Code, Linked Lists, Binary Search Trees",
-                    completed: "April 2025",
-                    pdf: "Smart Inventory Management System.pdf"
-                },
-                {
-                    title: "Quantum Supply Chain Optimization",
-                    description: "A detailed analysis of quantum computing applications in supply chain management, exploring quantum algorithms to solve NP-hard optimization problems in global supply chains.",
-                    tech: "QAOA, Quantum Annealing, QUBO, Hybrid Quantum-Classical Frameworks, VQE, QML, Digital Twins",
-                    completed: "October 2025",
-                    pdf: "Strategic supply chain network optimization using Quantum Algorithm.pdf"
-                },
-                {
-                    title: "Bank Branch Networking",
-                    description: "A case study on designing a secure and efficient computer network for a bank with 25 branches across Tamil Nadu, using IPv4 subnetting, OSPF routing, and VPN tunnels.",
-                    tech: "Cisco Packet Tracer, IPv4 Subnetting, OSPF, VPN (IPsec), TCP, Dual-Stack IPv6",
-                    completed: "October 2025",
-                    pdf: "Bank Branch Networking.pdf"
-                },
-                {
-                    title: "OS Choices & DevOps Practices",
-                    description: "A case study analyzing how OS selection influences DevOps workflows — CI/CD, automation, containerization — highlighting a transition to Linux-based infrastructure.",
-                    tech: "Linux, Windows Server, Jenkins, GitLab CI, Docker, Kubernetes, Ansible, Terraform, Puppet",
-                    completed: "November 2025",
-                    pdf: "The Impact of Operating System Choices on DevOps Practices.pdf"
-                }
-            ];
+  return (
+    <footer className="site-footer">
+      <div className="footer-card">
+        <div className="footer-divider"/>
+        <div className="footer-inner">
+          <div>
+            <div className="footer-logo">AG</div>
+            <p style={{marginTop:'.5rem'}}>Anivesh Gupta — Web Developer &amp; Designer</p>
+          </div>
 
-            return (
-                <section id="reports" className="section-reveal section-alt">
-                    <div className="section-header">
-                        <span className="section-num">04</span>
-                        <h2 className="section-title">Reports & Case Studies</h2>
-                    </div>
-                    <div className="reports-grid">
-                        {reports.map((report, index) => (
-                            <div className="report-card" key={index}>
-                                <div className="report-num">0{index + 1}</div>
-                                <h3>{report.title}</h3>
-                                <p>{report.description}</p>
-                                <div className="report-meta">
-                                    <span><i className="fas fa-tools"></i> {report.tech}</span>
-                                    <span><i className="fas fa-calendar-alt"></i> {report.completed}</span>
-                                </div>
-                                <a href="#" className="report-link" data-pdf={report.pdf}>
-                                    View Report <i className="fas fa-file-pdf"></i>
-                                </a>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="pdf-viewer-container">
-                        <div className="pdf-viewer">
-                            <iframe id="pdf-frame" src="" width="100%" height="600px" style={{ display: 'none', border: 'none' }}></iframe>
-                        </div>
-                    </div>
-                </section>
-            );
-        }
-
-        // Certificates Component
-        function Certificates() {
-            const certificates = [
-                {
-                    title: "Yantra Central Hackathon",
-                    description: "Earned certification from the Office of Students' Welfare for participating in the Yantra Central Hackathon.",
-                    issued: "Feb 2025",
-                    image: "Anivesh_Gupta_certificate.png"
-                },
-                {
-                    title: "Web Development Workshop",
-                    description: "Certified by Alpha Intern for participating in Winter Domination Web Development Workshop.",
-                    issued: "Mar 2025",
-                    image: "Anivesh Gupta Web Development Workshop Certificate.jpg"
-                },
-                {
-                    title: "Forests and their Management",
-                    description: "Certified by NPTEL for successfully completing the course with a consolidated score.",
-                    issued: "Apr 2025",
-                    image: "Anivesh Gupta Forests and their Management Certificate.jpg"
-                },
-                {
-                    title: "Data Structures and Algorithms",
-                    description: "Certified by Infosys Springboard for successfully completing the course.",
-                    issued: "May 2025",
-                    image: "Anivesh Gupta Data Structures and Algorithms Certificate.jpg"
-                },
-                {
-                    title: "Cyber Security Job Simulation",
-                    description: "Certified by Deloitte and Forage for completing practical tasks in cybersecurity.",
-                    issued: "Jun 2025",
-                    image: "Anivesh Gupta Cyber Security Certificate.jpg"
-                },
-                {
-                    title: "Data Science BootCamp",
-                    description: "Certified for completing a 6-week Data Science BootCamp on analytics and ML.",
-                    issued: "Jul 2025",
-                    image: "Anivesh Gupta Data Science BootCamp Certificate.jpg"
-                },
-                {
-                    title: "Oracle Cloud Infrastructure 2025 AI Foundations",
-                    description: "Certified by Oracle for successfully completing the AI Foundations Associate course.",
-                    issued: "Sep 2025",
-                    image: "Anivesh Gupta Oracle Cloud Infrastructure 2025 AI Foundations Associate Certificate.jpg"
-                },
-                {
-                    title: "Wild Life Ecology",
-                    description: "Certified by NPTEL for successfully completing the course with a consolidated score.",
-                    issued: "Oct 2025",
-                    image: "Anivesh Gupta Wild Life Ecology Certificate.jpg"
-                },
-                {
-                    title: "Human Computer Interaction",
-                    description: "Certified by NPTEL for successfully completing the course with a consolidated score.",
-                    issued: "Apr 2026",
-                    image: "Anivesh Gupta Human Computer Interaction Certificate.jpg"
-                },
-                {
-                    title: "IBM Java Developer",
-                    description: "Certified by IBM & SkillUp for completing the Java Developer course on Coursera.",
-                    issued: "Jun 2026",
-                    image: "Anivesh Gupta IBM Java Developer Certificate.jpg"
-                },
-                {
-                    title: "IBM Generative AI",
-                    description: "Certified by IBM for completing the Generative AI course offered by VIT.",
-                    issued: "July 2026",
-                    image: "Anivesh Gupta Generative AI Certificate.jpg"
-                }
-            ];
-
-            return (
-                <section id="certificates" className="section-reveal">
-                    <div className="section-header">
-                        <span className="section-num">05</span>
-                        <h2 className="section-title">Certificates</h2>
-                    </div>
-                    <div className="certificates-grid">
-                        {certificates.map((certificate, index) => (
-                            <div className="certificate-card" key={index}>
-                                <div className="cert-image-wrap">
-                                    <img src={certificate.image} alt={`${certificate.title} Certificate`} />
-                                    <div className="cert-overlay">
-                                        <i className="fas fa-expand"></i>
-                                    </div>
-                                </div>
-                                <div className="cert-body">
-                                    <span className="cert-date">{certificate.issued}</span>
-                                    <h3>{certificate.title}</h3>
-                                    <p>{certificate.description}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-            );
-        }
-
-        // Resume Component
-        function Resume() {
-            return (
-                <section id="resume" className="section-reveal section-alt">
-                    <div className="section-header">
-                        <span className="section-num">06</span>
-                        <h2 className="section-title">Resume</h2>
-                    </div>
-                    <div className="resume-wrapper">
-                        <div className="resume-info">
-                            <div className="resume-icon-wrap">
-                                <i className="fas fa-file-alt"></i>
-                            </div>
-                            <h3>My Resume</h3>
-                            <p>View or download my professional resume to learn more about my skills, experience, and achievements.</p>
-                            <p className="resume-updated"><i className="fas fa-sync-alt"></i> Updated: July 2026</p>
-                            <a href="Resume.pdf" download className="resume-dl-btn">
-                                <i className="fas fa-download"></i> Download PDF
-                            </a>
-                        </div>
-                        <div className="resume-preview">
-                            <iframe src="Resume.pdf" width="100%" height="500px" style={{ border: 'none', borderRadius: '12px' }}></iframe>
-                        </div>
-                    </div>
-                </section>
-            );
-        }
-
-        // Contact Component
-        function Contact() {
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                alert("Thank you for your message! I'll get back to you soon.");
-                e.target.reset();
-            };
-
-            return (
-                <section id="contact" className="section-reveal">
-                    <div className="section-header">
-                        <span className="section-num">07</span>
-                        <h2 className="section-title">Contact Me</h2>
-                    </div>
-                    <div className="contact-layout">
-                        <div className="contact-text">
-                            <h3>Let's work together.</h3>
-                            <p>Have a project in mind, a question, or just want to say hi? Drop me a message and I'll get back to you.</p>
-                            <div className="contact-links">
-                                <a href="mailto:aniveshgupta13579@gmail.com"><i className="fas fa-envelope"></i> aniveshgupta13579@gmail.com</a>
-                                <a href="https://www.linkedin.com/in/aniveshgupta/" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin"></i> linkedin.com/in/aniveshgupta</a>
-                                <a href="https://github.com/AniveshGuptaOfficial" target="_blank" rel="noopener noreferrer"><i className="fab fa-github"></i> github.com/AniveshGuptaOfficial</a>
-                            </div>
-                        </div>
-                        <form className="contact-form" onSubmit={handleSubmit}>
-                            <div className="form-group">
-                                <label>Your Name</label>
-                                <input type="text" placeholder="Rahul Sharma" required />
-                            </div>
-                            <div className="form-group">
-                                <label>Email Address</label>
-                                <input type="email" placeholder="rahul@example.com" required />
-                            </div>
-                            <div className="form-group">
-                                <label>Message</label>
-                                <textarea rows="5" placeholder="Hello Anivesh, I'd love to discuss..." required></textarea>
-                            </div>
-                            <button type="submit">Send Message <i className="fas fa-paper-plane"></i></button>
-                        </form>
-                    </div>
-                </section>
-            );
-        }
-
-        // Footer Component
-        function Footer() {
-            const socialLinks = [
-                { href: "https://twitter.com/yourcompany", icon: "fa-twitter", label: "Twitter" },
-                { href: "https://www.linkedin.com/in/aniveshgupta/", icon: "fa-linkedin", label: "LinkedIn" },
-                { href: "https://github.com/AniveshGuptaOfficial", icon: "fa-github", label: "GitHub" },
-                { href: "https://www.facebook.com/Anivesh.GuptaJi", icon: "fa-facebook", label: "Facebook" },
-                { href: "https://www.instagram.com/_its_me_aniveshgupta_official", icon: "fa-instagram", label: "Instagram" },
-                { href: "mailto:aniveshgupta13579@gmail.com", icon: "fa-envelope", label: "Email" },
-                { href: "https://api.whatsapp.com/send/?phone=916289028044&text&type=phone_number&app_absent=0", icon: "fa-whatsapp", label: "WhatsApp" }
-            ];
-
-            return (
-                <footer>
-                    <div className="footer-inner">
-                        <div className="footer-brand">
-                            <span className="footer-logo">AG</span>
-                            <p>Anivesh Gupta — Web Developer & Designer</p>
-                        </div>
-                        <div className="footer-socials">
-                            {socialLinks.map((link, index) => (
-                                <a href={link.href} key={index} aria-label={link.label} target="_blank" rel="noopener noreferrer">
-                                    <i className={`fab ${link.icon}`}></i>
-                                </a>
-                            ))}
-                        </div>
-                        <p className="footer-copy">© 2024 Anivesh Gupta · All rights reserved · Made with ❤️</p>
-                    </div>
-                </footer>
-            );
-        }
-
-        // Main App Component
-        function App() {
-            React.useEffect(() => {
-                // Smooth scrolling for nav links
-                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                    anchor.addEventListener('click', function(e) {
-                        const target = document.querySelector(this.getAttribute('href'));
-                        if (target) {
-                            e.preventDefault();
-                            target.scrollIntoView({ behavior: 'smooth' });
-                        }
-                    });
-                });
-
-                // Animate skill bars on scroll
-                const animateSkills = () => {
-                    document.querySelectorAll('.progress-fill').forEach(bar => {
-                        const rect = bar.getBoundingClientRect();
-                        if (rect.top <= window.innerHeight - 50) {
-                            bar.style.width = bar.getAttribute('data-width');
-                        }
-                    });
-                };
-
-                document.querySelectorAll('.progress-fill').forEach(bar => {
-                    bar.setAttribute('data-width', bar.style.width);
-                    bar.style.width = '0%';
-                });
-
-                // Section reveal on scroll
-                const revealSections = () => {
-                    document.querySelectorAll('.section-reveal').forEach(section => {
-                        const rect = section.getBoundingClientRect();
-                        if (rect.top <= window.innerHeight * 0.88) {
-                            section.classList.add('revealed');
-                        }
-                    });
-                };
-
-                // Sticky nav
-                const nav = document.querySelector('.nav-container');
-                const handleScroll = () => {
-                    animateSkills();
-                    revealSections();
-                    if (window.scrollY > 60) {
-                        nav.classList.add('nav-scrolled');
-                    } else {
-                        nav.classList.remove('nav-scrolled');
-                    }
-                };
-
-                window.addEventListener('scroll', handleScroll);
-                revealSections();
-
-                // Certificate lightbox
-                document.querySelectorAll('.certificate-card .cert-image-wrap img').forEach(img => {
-                    img.addEventListener('click', () => {
-                        const overlay = document.createElement('div');
-                        overlay.className = 'lightbox-overlay';
-                        const imgEl = document.createElement('img');
-                        imgEl.src = img.src;
-                        const close = document.createElement('button');
-                        close.className = 'lightbox-close';
-                        close.innerHTML = '&times;';
-                        overlay.appendChild(imgEl);
-                        overlay.appendChild(close);
-                        document.body.appendChild(overlay);
-                        const dismiss = () => document.body.removeChild(overlay);
-                        overlay.addEventListener('click', (e) => { if (e.target === overlay) dismiss(); });
-                        close.addEventListener('click', dismiss);
-                    });
-                });
-
-                // Report PDF viewer
-                document.querySelectorAll('.report-link').forEach(link => {
-                    link.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const pdfPath = this.getAttribute('data-pdf');
-                        const pdfFrame = document.getElementById('pdf-frame');
-                        if (pdfPath && pdfPath !== '') {
-                            pdfFrame.src = pdfPath;
-                            pdfFrame.style.display = 'block';
-                            document.querySelector('.pdf-viewer-container').scrollIntoView({ behavior: 'smooth' });
-                        } else {
-                            pdfFrame.style.display = 'none';
-                            alert('PDF not available yet!');
-                        }
-                    });
-                });
-
-                document.getElementById('pdf-frame').style.display = 'none';
-
-                return () => window.removeEventListener('scroll', handleScroll);
-            }, []);
-
-            return (
-                <div>
-                    <Header />
-                    <Nav />
-                    <About />
-                    <Skills />
-                    <Projects />
-                    <Reports />
-                    <Certificates />
-                    <Resume />
-                    <Contact />
-                    <Footer />
+          <div className="footer-socials">
+            {SOCIALS.map((s,i) => (
+              <a
+                key={i}
+                href={s.href}
+                className="icon3d"
+                aria-label={s.label}
+                data-brand={getBrand(s.label)}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{animationDelay: `${i * 0.12}s`}}
+              >
+                <div className="icon3d-cube" style={{animationDelay: `${i * 0.12}s`}}>
+                  {/* Front face */}
+                  <div className="icon3d-face icon3d-front">
+                    <i className={`${getPrefix(s.icon)} ${s.icon}`}/>
+                  </div>
+                  {/* Back face — same icon, glowing */}
+                  <div className="icon3d-face icon3d-back">
+                    <i className={`${getPrefix(s.icon)} ${s.icon}`}/>
+                  </div>
+                  {/* Side depth illusion */}
+                  <div className="icon3d-side"/>
                 </div>
-            );
-        }
+              </a>
+            ))}
+          </div>
 
-        ReactDOM.render(<App />, document.getElementById('root'));
-    </script>
+          <p className="footer-copy">© 2024 Anivesh Gupta · All rights reserved · Made with ❤️</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   PAGES
+══════════════════════════════════════════════ */
+
+/* ── HERO ── */
+function HeroPage({ go }) {
+  useEffect(() => {
+    if (!document.getElementById('hero3d-script')) {
+      const s = document.createElement('script');
+      s.id = 'hero3d-script'; s.src = 'hero3d.js';
+      document.body.appendChild(s);
+    }
+  }, []);
+  const sections = VIEWS.filter(v => v !== 'home');
+  return (
+    <div className="hero">
+      <canvas id="hero-canvas" className="hero-canvas"/>
+      <div className="hero-vignette"/>
+      <div className="hero-inner">
+        <div className="profile-wrap">
+          <div className="profile-ring"/>
+          <img src="Anivesh Gupta.jpg" alt="Anivesh Gupta" className="profile-img"/>
+        </div>
+        <div>
+          <span className="hero-tag">Portfolio 2025</span>
+          <h1>Anivesh<br/><em>Gupta</em></h1>
+          <p className="hero-sub">Web Developer <span className="amp">&amp;</span> Designer</p>
+          <div className="hero-badges">
+            <span className="badge"><i className="fas fa-map-marker-alt"/> VIT Vellore</span>
+            <span className="badge"><i className="fas fa-code"/> Full-Stack</span>
+            <span className="badge"><i className="fas fa-brain"/> ML / AI</span>
+          </div>
+          <div className="hero-cta">
+            {sections.map(v => (
+              <button key={v} className="hero-cta-btn" onClick={() => go(v)}>{LABELS[v]}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="scroll-hint" onClick={() => go('about')}>
+        explore <i className="fas fa-arrow-down"/>
+      </div>
+    </div>
+  );
+}
+
+/* ── ABOUT ── */
+function AboutPage() {
+  return (
+    <div className="pg">
+      <div className="sh"><span className="sh-num">{NUMS.about}</span><h2 className="sh-title">About Me</h2></div>
+      <div className="about-layout">
+        <div className="about-bio">
+          <p>Hi, I'm <strong>Anivesh Gupta</strong> — a passionate web developer and designer with a keen interest in behavioral alignment in social interactions, technology acceptance, and empirical evaluations of learning systems.</p>
+          <p>Currently pursuing my studies at <strong>VIT Vellore</strong>, I have a strong foundation in programming, logic, and computational problem-solving. I enjoy working on real-world projects and continuously expanding my technical expertise.</p>
+        </div>
+        <div>
+          <h3 className="edu-heading">Education</h3>
+          <div className="edu-cards">
+            {EDUCATION.map((e,i) => (
+              <div className="edu-card" key={i}>
+                <div className="edu-img"><img src={e.image} alt={e.alt}/></div>
+                <div className="edu-info">
+                  <h4>{e.school}</h4>
+                  <span className="edu-period">{e.period}</span>
+                  <p>{e.detail}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <Footer/>
+    </div>
+  );
+}
+
+/* ── SKILLS ── */
+function SkillsPage() {
+  const refs = useRef([]);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      refs.current.forEach(b => { if(b) b.style.width = b.dataset.pct; });
+    }, 120);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <div className="pg">
+      <div className="sh"><span className="sh-num">{NUMS.skills}</span><h2 className="sh-title">Skills</h2></div>
+      <div className="skills-wrap">
+        {SKILLS.map((sk,i) => (
+          <div key={i}>
+            <div className="skill-label">
+              <span className="skill-name">{sk.name}</span>
+              <span className="skill-pct">{sk.pct}%</span>
+            </div>
+            <div className="progress-track">
+              <div className="progress-fill"
+                ref={el => refs.current[i]=el}
+                data-pct={`${sk.pct}%`}
+                style={{width:'0%', transitionDelay:`${i*90}ms`}}/>
+            </div>
+          </div>
+        ))}
+      </div>
+      <Footer/>
+    </div>
+  );
+}
+
+/* ── PROJECTS ── */
+function ProjectsPage() {
+  return (
+    <div className="pg">
+      <div className="sh"><span className="sh-num">{NUMS.projects}</span><h2 className="sh-title">Projects</h2></div>
+      <div className="project-grid">
+        {PROJECTS.map((p,i) => (
+          <div className="project-card" key={i}>
+            <div className="project-top">
+              <div className="project-icon"><i className={`fas ${p.icon}`}/></div>
+              {p.status==='wip'  && <span className="wip-badge">WIP</span>}
+              {p.status==='live' && <span className="live-badge">Live</span>}
+            </div>
+            <h3>{p.title}</h3>
+            <p>{p.description}</p>
+            <div className="tech-tags">{p.tech.map((t,j)=><span className="tag" key={j}>{t}</span>)}</div>
+            <a href={p.link} className="project-link" target="_blank" rel="noopener noreferrer">
+              {p.linkText} <i className="fas fa-arrow-right"/>
+            </a>
+          </div>
+        ))}
+      </div>
+      <Footer/>
+    </div>
+  );
+}
+
+/* ── REPORTS ── */
+function ReportsPage() {
+  const [activePdf, setActivePdf] = useState(null);
+  return (
+    <div className="pg wide">
+      <div className="sh"><span className="sh-num">{NUMS.reports}</span><h2 className="sh-title">Reports &amp; Case Studies</h2></div>
+      <div className="reports-grid">
+        {REPORTS.map((r,i) => (
+          <div className="report-card" key={i}>
+            <div className="report-num">0{i+1}</div>
+            <h3>{r.title}</h3>
+            <p>{r.description}</p>
+            <div className="report-meta">
+              <span><i className="fas fa-tools"/> {r.tech}</span>
+              <span><i className="fas fa-calendar-alt"/> {r.completed}</span>
+            </div>
+            <button className="report-btn"
+              onClick={() => setActivePdf(activePdf===r.pdf ? null : r.pdf)}>
+              {activePdf===r.pdf ? 'Close PDF ✕' : <>View Report <i className="fas fa-file-pdf"/></>}
+            </button>
+          </div>
+        ))}
+      </div>
+      {activePdf && (
+        <div className="pdf-wrap">
+          <iframe src={activePdf} width="100%" height="650px" style={{border:'none'}}/>
+        </div>
+      )}
+      <Footer/>
+    </div>
+  );
+}
+
+/* ── CERTIFICATES ── */
+function CertificatesPage() {
+  const [lb, setLb] = useState(null);
+  return (
+    <div className="pg wide">
+      <div className="sh"><span className="sh-num">{NUMS.certificates}</span><h2 className="sh-title">Certificates</h2></div>
+      <div className="certs-grid">
+        {CERTIFICATES.map((c,i) => (
+          <div className="cert-card" key={i}>
+            <div className="cert-img-wrap" onClick={() => setLb(c.image)}>
+              <img src={c.image} alt={c.title}/>
+              <div className="cert-overlay"><i className="fas fa-expand"/></div>
+            </div>
+            <div className="cert-body">
+              <span className="cert-date">{c.issued}</span>
+              <h3>{c.title}</h3>
+              <p>{c.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      {lb && (
+        <div className="lightbox" onClick={() => setLb(null)}>
+          <img src={lb} alt="Certificate" onClick={e => e.stopPropagation()}/>
+          <button className="lb-close" onClick={() => setLb(null)}>&times;</button>
+        </div>
+      )}
+      <Footer/>
+    </div>
+  );
+}
+
+/* ── RESUME ── */
+function ResumePage() {
+  return (
+    <div className="pg">
+      <div className="sh"><span className="sh-num">{NUMS.resume}</span><h2 className="sh-title">Resume</h2></div>
+      <div className="resume-wrap">
+        <div className="resume-info">
+          <div className="resume-icon"><i className="fas fa-file-alt"/></div>
+          <h3>My Resume</h3>
+          <p>View or download my professional resume to learn more about my skills, experience, and achievements.</p>
+          <p className="resume-updated"><i className="fas fa-sync-alt"/> Updated: July 2026</p>
+          <a href="Resume.pdf" download className="resume-dl"><i className="fas fa-download"/> Download PDF</a>
+        </div>
+        <div className="resume-preview">
+          <iframe src="Resume.pdf" width="100%" height="520px"/>
+        </div>
+      </div>
+      <Footer/>
+    </div>
+  );
+}
+
+/* ── CONTACT ── */
+function ContactPage() {
+  const submit = e => { e.preventDefault(); alert("Thank you! I'll get back to you soon."); e.target.reset(); };
+  return (
+    <div className="pg">
+      <div className="sh"><span className="sh-num">{NUMS.contact}</span><h2 className="sh-title">Contact Me</h2></div>
+      <div className="contact-layout">
+        <div className="contact-text">
+          <h3>Let's work together.</h3>
+          <p>Have a project in mind, a question, or just want to say hi? Drop me a message and I'll get back to you.</p>
+          <div className="contact-links">
+            <a href="mailto:aniveshgupta13579@gmail.com"><i className="fas fa-envelope"/> aniveshgupta13579@gmail.com</a>
+            <a href="https://www.linkedin.com/in/aniveshgupta/" target="_blank" rel="noopener noreferrer"><i className="fab fa-linkedin"/> linkedin.com/in/aniveshgupta</a>
+            <a href="https://github.com/AniveshGuptaOfficial" target="_blank" rel="noopener noreferrer"><i className="fab fa-github"/> github.com/AniveshGuptaOfficial</a>
+          </div>
+        </div>
+        <form className="contact-form" onSubmit={submit}>
+          <div className="form-group"><label>Your Name</label><input type="text" placeholder="Rahul Sharma" required/></div>
+          <div className="form-group"><label>Email Address</label><input type="email" placeholder="rahul@example.com" required/></div>
+          <div className="form-group"><label>Message</label><textarea rows="5" placeholder="Hello Anivesh, I'd love to discuss..." required/></div>
+          <button type="submit" className="submit-btn">Send Message <i className="fas fa-paper-plane"/></button>
+        </form>
+      </div>
+      <Footer/>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════
+   APP  —  view-swap router
+══════════════════════════════════════════════ */
+/* ── ScrollTop wrapper: resets scroll to top on every mount ── */
+function Page({ children }) {
+  const ref = useRef(null);
+  useEffect(() => { if (ref.current) ref.current.scrollTop = 0; }, []);
+  return <div ref={ref} className="view-page-inner">{children}</div>;
+}
+
+function App() {
+  const { cur, prev, dir, prog, go, animating } = useRouter();
+
+  const renderView = (v) => {
+    switch(v) {
+      case 'home':         return <Page><HeroPage go={go}/></Page>;
+      case 'about':        return <Page><AboutPage/></Page>;
+      case 'skills':       return <Page><SkillsPage/></Page>;
+      case 'projects':     return <Page><ProjectsPage/></Page>;
+      case 'reports':      return <Page><ReportsPage/></Page>;
+      case 'certificates': return <Page><CertificatesPage/></Page>;
+      case 'resume':       return <Page><ResumePage/></Page>;
+      case 'contact':      return <Page><ContactPage/></Page>;
+      default:             return <Page><HeroPage go={go}/></Page>;
+    }
+  };
+
+  const enterClass = dir === 'right' ? 'enter-right' : 'enter-left';
+  const exitClass  = dir === 'right' ? 'exit-left'   : 'exit-right';
+
+  return (
+    <div id="spa-root">
+      {prog > 0 && <div className="pg-bar" style={{width:`${prog}%`}}/>}
+
+      <TopNav cur={cur} go={go}/>
+      <Breadcrumb cur={cur} go={go}/>
+
+      <div className="view-stage">
+        {animating && prev && (
+          <div className={`view-page ${exitClass}`} key={`exit-${prev}`}>
+            {renderView(prev)}
+          </div>
+        )}
+        <div className={`view-page ${animating ? enterClass : ''}`} key={cur}>
+          {renderView(cur)}
+        </div>
+      </div>
+
+      <SideNav cur={cur} go={go}/>
+      <CursorFX/>
+    </div>
+  );
+}
+
+
+/* ══════════════════════════════════════════════
+   CURSOR FX  — polyhedral 3D cursor + trail
+   + ambient floating particles (site-wide)
+══════════════════════════════════════════════ */
+function CursorFX() {
+  const cursorRef  = useRef(null);
+  const ambientRef = useRef(null);
+
+  useEffect(() => {
+    const IS_MOBILE = window.matchMedia('(pointer:coarse)').matches;
+    if (IS_MOBILE) { initTouchRipple(); initAmbient(); return; }
+
+    // ── hide native cursor ──
+    const styleEl = document.createElement('style');
+    styleEl.id = 'cursor-hide';
+    styleEl.textContent = 'html,html *{cursor:none!important}';
+    document.head.appendChild(styleEl);
+
+    initCursor();
+    initAmbient();
+
+    return () => {
+      styleEl.remove();
+    };
+  }, []);
+
+  /* ─── Cursor canvas ─── */
+  function initCursor() {
+    const cvs = cursorRef.current;
+    if (!cvs) return;
+    const ctx = cvs.getContext('2d');
+    let W = window.innerWidth, H = window.innerHeight;
+    cvs.width = W; cvs.height = H;
+
+    const resize = () => { W = window.innerWidth; H = window.innerHeight; cvs.width = W; cvs.height = H; };
+    window.addEventListener('resize', resize);
+
+    const mouse  = { x: -300, y: -300 };
+    const pos    = { x: -300, y: -300 };
+    const trail  = [];
+    const bursts = [];
+    let ang = 0, hoverSc = 1, isHov = false, wasHov = false;
+
+    const SEL = 'a,button,input,textarea,.project-card,.report-card,.cert-card,.edu-card,.badge,.hero-cta-btn,.nav-btn,.sdot,.footer-socials a,.report-btn,.resume-dl,.submit-btn';
+
+    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+    window.addEventListener('click', () => burst(pos.x, pos.y, 16));
+
+    function snap(mx, my) {
+      let best = null, bd = 72;
+      document.querySelectorAll(SEL).forEach(el => {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width*.5, cy = r.top + r.height*.5;
+        const d = Math.hypot(mx-cx, my-cy);
+        if (d < bd) { bd=d; best={cx,cy,d}; }
+      });
+      if (!best) return {x:mx,y:my};
+      const p = 1 - best.d/72;
+      return {x: mx + (best.cx-mx)*p*.36, y: my + (best.cy-my)*p*.36};
+    }
+
+    function burst(x,y,n) {
+      for (let i=0;i<n;i++) {
+        const a=Math.random()*Math.PI*2, s=1.5+Math.random()*4.5;
+        bursts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,decay:.035+Math.random()*.05,r:1+Math.random()*2.5});
+      }
+    }
+
+    function octaVerts(cx,cy,sz,rx,ry,rz) {
+      const raw=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]];
+      const c=Math.cos,s=Math.sin;
+      return raw.map(([x,y,z])=>{
+        let ny=c(rx)*y-s(rx)*z,nz=s(rx)*y+c(rx)*z; y=ny;z=nz;
+        let nx=c(ry)*x+s(ry)*z; nz=-s(ry)*x+c(ry)*z; x=nx;z=nz;
+        nx=c(rz)*x-s(rz)*y; ny=s(rz)*x+c(rz)*y; x=nx;y=ny;
+        const fov=3,sc=fov/(fov+z);
+        return [cx+x*sz*sc, cy+y*sz*sc];
+      });
+    }
+    const EDGES=[[0,2],[0,3],[1,2],[1,3],[2,4],[2,5],[3,4],[3,5],[0,4],[0,5],[1,4],[1,5]];
+
+    function drawOcta(x,y,sc,alpha) {
+      const verts=octaVerts(x,y,11*sc,ang*.65,ang,ang*.45);
+      ctx.save();
+      ctx.globalAlpha=alpha;
+      ctx.strokeStyle='#a78bfa';
+      ctx.lineWidth=1;
+      ctx.shadowColor='#a78bfa';
+      ctx.shadowBlur=14*sc;
+      EDGES.forEach(([a,b])=>{
+        ctx.beginPath();
+        ctx.moveTo(verts[a][0],verts[a][1]);
+        ctx.lineTo(verts[b][0],verts[b][1]);
+        ctx.stroke();
+      });
+      ctx.beginPath();
+      ctx.arc(x,y,1.8*sc,0,Math.PI*2);
+      ctx.fillStyle='#c4b5fd';
+      ctx.shadowBlur=10; ctx.shadowColor='#c4b5fd';
+      ctx.fill();
+      if (isHov) {
+        ctx.beginPath();
+        ctx.arc(x,y,19*sc,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(167,139,250,${.22*alpha})`;
+        ctx.lineWidth=1; ctx.shadowBlur=18;
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function lerp(a,b,t){return a+(b-a)*t;}
+
+    let raf;
+    function loop() {
+      raf = requestAnimationFrame(loop);
+      ctx.clearRect(0,0,W,H);
+
+      const t = snap(mouse.x, mouse.y);
+      pos.x = lerp(pos.x, t.x, .12);
+      pos.y = lerp(pos.y, t.y, .12);
+      trail.push({x:pos.x,y:pos.y});
+      if(trail.length>22) trail.shift();
+
+      const el = document.elementFromPoint(mouse.x, mouse.y);
+      isHov = el ? !!el.closest(SEL) : false;
+      if(isHov && !wasHov) burst(pos.x,pos.y,9);
+      wasHov=isHov;
+      hoverSc=lerp(hoverSc, isHov?1.55:1, .11);
+      ang+=.021;
+
+      trail.forEach((pt,i)=>{
+        const life=i/trail.length;
+        ctx.save();
+        ctx.globalAlpha=life*.3;
+        ctx.fillStyle='#a78bfa';
+        ctx.shadowColor='#a78bfa'; ctx.shadowBlur=5;
+        ctx.beginPath();
+        ctx.arc(pt.x,pt.y,lerp(.5,3,life),0,Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+      });
+
+      for(let i=bursts.length-1;i>=0;i--){
+        const p=bursts[i];
+        p.x+=p.vx; p.y+=p.vy; p.vx*=.92; p.vy*=.92; p.life-=p.decay;
+        if(p.life<=0){bursts.splice(i,1);continue;}
+        ctx.save();
+        ctx.globalAlpha=p.life*.7;
+        ctx.fillStyle='#a78bfa';
+        ctx.shadowColor='#a78bfa'; ctx.shadowBlur=8;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r*p.life,0,Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+      }
+      drawOcta(pos.x,pos.y,hoverSc,.92);
+    }
+    loop();
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize',resize); };
+  }
+
+  /* ─── Ambient canvas ─── */
+  function initAmbient() {
+    const cvs = ambientRef.current;
+    if (!cvs) return;
+    const ctx = cvs.getContext('2d');
+    const IS_MOB = window.matchMedia('(pointer:coarse)').matches;
+    let W = window.innerWidth, H = window.innerHeight;
+    cvs.width=W; cvs.height=H;
+    const resize = ()=>{ W=window.innerWidth; H=window.innerHeight; cvs.width=W; cvs.height=H; };
+    window.addEventListener('resize', resize);
+
+    const lerp=(a,b,t)=>a+(b-a)*t;
+    const rand=(a,b)=>a+Math.random()*(b-a);
+    const mouse={x:W*.5,y:H*.5}, sm={x:W*.5,y:H*.5};
+    // Read theme color dynamically each frame
+    const getColor=()=>getComputedStyle(document.documentElement).getPropertyValue('--ambient-color').trim()||'#a78bfa';
+    window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
+    window.addEventListener('touchmove',e=>{mouse.x=e.touches[0].clientX;mouse.y=e.touches[0].clientY;},{passive:true});
+
+    const FC=IS_MOB?12:26;
+    const frags=Array.from({length:FC},()=>({
+      x:rand(0,W),y:rand(0,H),vx:rand(-.1,.1),vy:rand(-.07,.07),
+      size:rand(5,16),sides:[3,4,6][Math.floor(Math.random()*3)],
+      angle:rand(0,Math.PI*2),spin:rand(-.003,.003),
+      alpha:rand(.02,.06),depth:rand(.3,1),phase:rand(0,Math.PI*2)
+    }));
+
+    const mkP=()=>({x:rand(0,W),y:rand(H*.1,H),vx:rand(-.05,.05),vy:rand(-.14,-.02),r:rand(.7,2),alpha:rand(.04,.1),depth:rand(.2,.9),life:rand(.6,1),decay:rand(.0004,.0018),phase:rand(0,Math.PI*2)});
+    const PC=IS_MOB?20:45;
+    const parts=Array.from({length:PC},mkP);
+
+    const SC=IS_MOB?3:6;
+    const streams=Array.from({length:SC},()=>({x:rand(0,W),y:rand(0,H),angle:rand(0,Math.PI*2),len:rand(40,120),spd:rand(.2,.5),alpha:rand(.025,.06),depth:rand(.2,.8)}));
+
+    function poly(cx,cy,r,sides,a){
+      ctx.beginPath();
+      for(let i=0;i<=sides;i++){const th=(i/sides)*Math.PI*2+a; i===0?ctx.moveTo(cx+Math.cos(th)*r,cy+Math.sin(th)*r):ctx.lineTo(cx+Math.cos(th)*r,cy+Math.sin(th)*r);}
+      ctx.closePath();
+    }
+
+    let t=0, raf2;
+    function loop(){
+      raf2=requestAnimationFrame(loop);
+      t+=.008;
+      ctx.clearRect(0,0,W,H);
+      sm.x=lerp(sm.x,mouse.x,.05); sm.y=lerp(sm.y,mouse.y,.05);
+      const mx=sm.x-W*.5, my=sm.y-H*.5;
+
+      streams.forEach(s=>{
+        s.x+=Math.cos(s.angle)*s.spd; s.y+=Math.sin(s.angle)*s.spd;
+        if(s.x>W+150)s.x=-100; if(s.x<-150)s.x=W+100;
+        if(s.y>H+150)s.y=-100; if(s.y<-150)s.y=H+100;
+        const px=s.x+mx*s.depth*.015, py=s.y+my*s.depth*.015;
+        ctx.save(); ctx.globalAlpha=s.alpha*(.7+.3*Math.sin(t+s.depth*3));
+        ctx.strokeStyle=getColor(); ctx.lineWidth=.7;
+        ctx.beginPath(); ctx.moveTo(px,py);
+        ctx.lineTo(px+Math.cos(s.angle)*s.len,py+Math.sin(s.angle)*s.len);
+        ctx.stroke(); ctx.restore();
+      });
+
+      frags.forEach(f=>{
+        f.x+=f.vx; f.y+=f.vy; f.angle+=f.spin;
+        if(f.x<-40)f.x=W+30; if(f.x>W+40)f.x=-30;
+        if(f.y<-40)f.y=H+30; if(f.y>H+40)f.y=-30;
+        const px=f.x+mx*f.depth*.022, py=f.y+my*f.depth*.022;
+        const pulse=.8+.2*Math.sin(t*.7+f.phase);
+        ctx.save(); ctx.globalAlpha=f.alpha*pulse;
+        const fc=getColor();ctx.strokeStyle=fc; ctx.lineWidth=.8;
+        ctx.shadowColor=fc; ctx.shadowBlur=3;
+        poly(px,py,f.size*pulse,f.sides,f.angle); ctx.stroke(); ctx.restore();
+      });
+
+      parts.forEach((p,i)=>{
+        p.x+=p.vx+mx*p.depth*.003; p.y+=p.vy; p.life-=p.decay;
+        if(p.life<=0||p.y<-20){parts[i]=mkP();return;}
+        const pulse=.6+.4*Math.sin(t*1.2+p.phase);
+        ctx.save(); ctx.globalAlpha=p.alpha*p.life*pulse;
+        const pc=getColor();ctx.fillStyle=pc; ctx.shadowColor=pc; ctx.shadowBlur=3;
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); ctx.restore();
+      });
+    }
+    loop();
+    return ()=>{ cancelAnimationFrame(raf2); window.removeEventListener('resize',resize); };
+  }
+
+  /* ─── Touch ripple (mobile) ─── */
+  function initTouchRipple() {
+    const cvs = cursorRef.current;
+    if (!cvs) return;
+    const ctx = cvs.getContext('2d');
+    cvs.width=window.innerWidth; cvs.height=window.innerHeight;
+    window.addEventListener('resize',()=>{cvs.width=window.innerWidth;cvs.height=window.innerHeight;});
+    const rips=[];
+    document.addEventListener('touchstart',e=>{ const t=e.touches[0]; rips.push({x:t.clientX,y:t.clientY,r:0,life:1}); });
+    (function loop(){
+      requestAnimationFrame(loop);
+      ctx.clearRect(0,0,cvs.width,cvs.height);
+      for(let i=rips.length-1;i>=0;i--){
+        const rp=rips[i]; rp.r+=2.8; rp.life-=.038;
+        if(rp.life<=0){rips.splice(i,1);continue;}
+        ctx.save(); ctx.globalAlpha=rp.life*.32;
+        ctx.strokeStyle='#a78bfa'; ctx.shadowColor='#a78bfa'; ctx.shadowBlur=12; ctx.lineWidth=1.4;
+        ctx.beginPath(); ctx.arc(rp.x,rp.y,rp.r,0,Math.PI*2); ctx.stroke(); ctx.restore();
+      }
+    })();
+  }
+
+  return (
+    <>
+      {/* Ambient layer — behind all content */}
+      <canvas ref={ambientRef} style={{position:'fixed',inset:0,width:'100vw',height:'100vh',zIndex:0,pointerEvents:'none',mixBlendMode:'screen',opacity:.5}}/>
+      {/* Cursor canvas — above all content */}
+      <canvas ref={cursorRef} style={{position:'fixed',inset:0,width:'100vw',height:'100vh',zIndex:2147483647,pointerEvents:'none'}}/>
+    </>
+  );
+}
+
+ReactDOM.render(<App/>, document.getElementById('root'));
+</script>
 </body>
 </html>
