@@ -139,12 +139,12 @@
     .sh-title::after{content:'';position:absolute;bottom:-6px;left:0;width:2.5rem;height:3px;background:var(--accent);border-radius:2px}
 
     /* ════ HERO ════ */
-    .hero{position:relative;min-height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--hero-glow) 0%,var(--bg) 70%)}
+    .hero{position:relative;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--hero-glow) 0%,var(--bg) 70%)}
     .hero-canvas{position:absolute;inset:0;width:100%!important;height:100%!important;z-index:0;pointer-events:none}
     :root.light .hero-canvas{opacity:.35}
     .hero-grain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.03;mix-blend-mode:overlay;z-index:1}
     .hero-vignette{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 70% 55% at 50% 50%,transparent 30%,var(--vig-edge) 100%),linear-gradient(to bottom,transparent 60%,var(--vig-end) 100%)}
-    .hero-inner{position:relative;z-index:2;display:flex;align-items:center;gap:4rem;padding:3rem 2rem 6rem;max-width:1100px;width:100%;justify-content:center;animation:fadeUp .9s ease both}
+    .hero-inner{position:relative;z-index:2;display:flex;align-items:center;gap:4rem;padding:3rem 2rem 2.5rem;max-width:1100px;width:100%;justify-content:center;animation:fadeUp .9s ease both}
     .hero-text{min-width:0}
     .profile-wrap{position:relative;flex-shrink:0}
     .profile-ring{position:absolute;inset:-8px;border-radius:50%;background:conic-gradient(var(--accent),var(--accent2),var(--accent));animation:spin 8s linear infinite;opacity:.6}
@@ -161,6 +161,33 @@
     .hero-cta{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem}
     .hero-cta-btn{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.28);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;padding:.5rem 1.15rem;border-radius:100px;cursor:pointer;transition:background .25s,border-color .25s,color .25s}
     .hero-cta-btn:hover{background:var(--accent2);border-color:var(--accent2);color:#fff}
+    /* ── Spoiler spotlight (home) ── */
+    .spotlight{position:relative;z-index:2;width:100%;max-width:1100px;padding:0 2rem 5.5rem;animation:fadeUp .9s .15s ease both}
+    .spot-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+    .spot-head h2{font-family:'Syne',sans-serif;font-size:1.25rem;font-weight:700;color:var(--white);display:flex;align-items:center;gap:.6rem}
+    .spot-head h2 i{color:var(--accent);font-size:1rem}
+    .spot-head p{color:var(--muted);font-size:.82rem}
+    .spot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(250px,100%),1fr));gap:1rem;list-style:none;margin:0;padding:0}
+    .spot-card{height:100%;background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.35rem;display:flex;flex-direction:column;gap:.6rem;transition:border-color .3s,transform .3s}
+    .spot-card:hover{border-color:rgba(167,139,250,.35);transform:translateY(-3px)}
+    .spot-top{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+    .spot-status{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:500;display:inline-flex;align-items:center;gap:.4rem;color:var(--accent)}
+    .spot-status::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
+    .spot-status.building::before{animation:spotPulse 1.6s ease infinite}
+    .spot-status.next{color:#f5a524}
+    .spot-status.secret{color:var(--muted)}
+    .spot-eta{font-size:.72rem;color:var(--muted)}
+    .spot-card h3{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;color:var(--white)}
+    .spot-card > p{font-size:.86rem;color:var(--muted);line-height:1.55}
+    .spot-progress{height:4px;background:var(--surface2);border-radius:4px;overflow:hidden}
+    .spot-progress span{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:inherit}
+    .spot-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:auto}
+    .spoiler{all:unset;cursor:pointer;font-size:.84rem;line-height:1.5;color:var(--text);border-radius:8px;padding:.45rem .6rem;background:var(--accent-g);border:1px dashed rgba(167,139,250,.35);transition:filter .35s}
+    .spoiler:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .spoiler .spoiler-label{display:block;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.2rem}
+    .spoiler .spoiler-text{filter:blur(5px);transition:filter .35s;user-select:none}
+    .spoiler[aria-expanded="true"] .spoiler-text{filter:none;user-select:text}
+    @keyframes spotPulse{0%,100%{box-shadow:0 0 0 0 currentColor}50%{box-shadow:0 0 0 4px transparent}}
     .scroll-hint{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);color:var(--muted);font-family:inherit;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;z-index:2;animation:pulseY 2s ease infinite;cursor:pointer;background:none;border:none;padding:.5rem .75rem}
 
     /* ════ ABOUT ════ */
@@ -439,7 +466,9 @@
     }
     @media(max-width:768px){
       :root{--nav-h:56px}
-      .hero-inner{flex-direction:column;text-align:center;gap:1.75rem;padding:2.5rem 1.25rem 5.5rem}
+      .hero-inner{flex-direction:column;text-align:center;gap:1.75rem;padding:2.5rem 1.25rem 2rem}
+      .spotlight{padding:0 1.25rem 5rem}
+      .spot-head{flex-direction:column;align-items:flex-start;gap:.35rem}
       .hero-badges,.hero-cta{justify-content:center}
       .profile-img{width:150px;height:150px}
       .pg{padding:2rem 1.25rem 3rem}
@@ -470,7 +499,8 @@
     }
     /* Short landscape phones */
     @media (max-height:520px) and (orientation:landscape){
-      .hero-inner{padding-top:1.5rem;padding-bottom:4rem}
+      .hero-inner{padding-top:1.5rem;padding-bottom:1.5rem}
+      .spotlight{padding-bottom:2rem}
       .profile-img{width:110px;height:110px}
       .scroll-hint{display:none}
     }
@@ -510,6 +540,14 @@ const PROJECTS = [
   {icon:"fa-book",title:"Books4MU",description:"A platform to access and share university book resources.",tech:["HTML","CSS","JavaScript"],link:"https://aniveshguptaofficial.github.io/Books-For-My-University/",linkText:"In Progress",status:"wip"},
   {icon:"fa-hand-paper",title:"Real-Time Sign Language Recognition",description:"An intelligent real-time hand gesture recognition system that converts sign language into text and speech using MediaPipe and an SVM (RBF kernel) classifier.",tech:["Python","OpenCV","MediaPipe","NumPy","Pandas","Scikit-learn (SVM)","Pyttsx3"],link:"https://github.com/AniveshGuptaOfficial/Real-Time-Sign-Language-Recognition-System",linkText:"View on GitHub",status:"live"},
   {icon:"fa-chess",title:"Chess",description:"A fully functional chess game with multiplayer support.",tech:["HTML","CSS","JavaScript"],link:"#",linkText:"In Progress",status:"wip"},
+];
+/* Spoiler Spotlight on the home page — edit freely.
+   status: "building" (working on it now) | "next" (upcoming) | "secret" (teaser only)
+   progress: 0–100, optional · eta: optional · spoiler: optional hidden text, click to reveal */
+const SPOTLIGHT = [
+  {status:"building",title:"Books4MU",teaser:"A shared library of university book resources for VIT students.",progress:60,eta:"Dec 2026",tags:["HTML","CSS","JavaScript"],spoiler:"Search and filtering by course code are coming next."},
+  {status:"building",title:"Chess",teaser:"A fully playable chess game with multiplayer support.",progress:35,tags:["JavaScript"],spoiler:"Online play with a friend through a share link."},
+  {status:"secret",title:"Something new",teaser:"An AI-powered side project is in the works.",eta:"2027",tags:["ML / AI"],spoiler:"Can't say much yet. Check back soon!"},
 ];
 const REPORTS = [
   {title:"Caste-Based Politics",description:"A detailed analysis of how caste influences political mobilization, representation, and governance in India. Explores key thinkers like B.R. Ambedkar and M.N. Srinivas.",tech:"Sociological Analysis, Political Frameworks, Policy Review",completed:"October 2025",pdf:"Caste Based Politics.pdf"},
@@ -798,10 +836,56 @@ function HeroPage({ go }) {
           </nav>
         </div>
       </div>
+      {SPOTLIGHT.length > 0 && <Spotlight/>}
       <button className="scroll-hint" onClick={() => go('about')}>
         explore <i className="fas fa-arrow-down" aria-hidden="true"/>
       </button>
     </section>
+  );
+}
+
+/* ── SPOILER SPOTLIGHT (home) ── */
+const SPOT_LABELS = { building:"Building now", next:"Up next", secret:"Top secret" };
+function Spoiler({ text }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button type="button" className="spoiler" aria-expanded={open} onClick={() => setOpen(o => !o)}>
+      <span className="spoiler-label"><i className={`fas ${open ? 'fa-eye' : 'fa-eye-slash'}`} aria-hidden="true"/> {open ? 'Spoiler' : 'Tap to reveal spoiler'}</span>
+      <span className="spoiler-text" aria-hidden={!open}>{text}</span>
+    </button>
+  );
+}
+function Spotlight() {
+  return (
+    <aside className="spotlight" aria-labelledby="spot-title">
+      <div className="spot-head">
+        <h2 id="spot-title"><i className="fas fa-bolt" aria-hidden="true"/> Spoiler Spotlight</h2>
+        <p>What I'm building now and what's coming next</p>
+      </div>
+      <ul className="spot-grid">
+        {SPOTLIGHT.map((s,i) => (
+          <li key={i}>
+            <article className="spot-card">
+              <div className="spot-top">
+                <span className={`spot-status ${s.status}`}>{SPOT_LABELS[s.status] || s.status}</span>
+                {s.eta && <span className="spot-eta">ETA {s.eta}</span>}
+              </div>
+              <h3>{s.title}</h3>
+              <p>{s.teaser}</p>
+              {typeof s.progress === 'number' && (
+                <div className="spot-progress" role="progressbar" aria-label={`${s.title} progress`} aria-valuemin="0" aria-valuemax="100" aria-valuenow={s.progress}>
+                  <span style={{width:`${s.progress}%`}}/>
+                </div>
+              )}
+              {s.spoiler && <Spoiler text={s.spoiler}/>}
+              {s.tags && s.tags.length > 0 && (
+                <div className="spot-tags">{s.tags.map(t => <span className="tag" key={t}>{t}</span>)}</div>
+              )}
+            </article>
+          </li>
+        ))}
+      </ul>
+    </aside>
   );
 }
 
