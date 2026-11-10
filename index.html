@@ -3,12 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Anivesh Gupta</title>
+  <title>Anivesh Gupta — Portfolio</title>
+  <meta name="description" content="Portfolio of Anivesh Gupta — web developer and designer at VIT Vellore. Projects, reports, certificates, resume and contact." />
+  <meta name="theme-color" content="#0d0d0f" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230d0d0f'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-weight='800' font-size='30' fill='%23a78bfa'%3EAG%3C/text%3E%3C/svg%3E" />
+  <!-- Apply saved / system theme before first paint to avoid a flash -->
+  <script>
+    (function(){
+      try{
+        var t = localStorage.getItem('theme');
+        if(!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        if(t === 'light') document.documentElement.classList.add('light');
+      }catch(e){}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="hero3d.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.23.3/babel.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -20,14 +36,23 @@
       --r:14px;--r-lg:20px;
       /* ambient canvas tint in dark mode */
       --ambient-color:#a78bfa;
+      --nav-bg:rgba(13,13,15,.9);--menu-bg:rgba(13,13,15,.97);
+      --hover-bg:rgba(255,255,255,.07);
+      --hero-glow:#1e0a3c;--vig-edge:rgba(13,13,15,.55);--vig-end:rgba(13,13,15,.95);
+      --nav-h:60px;
+      color-scheme:dark;
     }
     /* Light mode token overrides */
     :root.light{
       --bg:#f5f4f9;--surface:#ffffff;--surface2:#ede9fb;
       --border:rgba(0,0,0,0.09);
       --accent:#7c3aed;--accent2:#5b21b6;--accent-g:rgba(124,58,237,0.1);
-      --text:#1a1a2e;--muted:#6b6b80;--white:#1a1a2e;
+      --text:#1a1a2e;--muted:#5f5f73;--white:#1a1a2e;
       --ambient-color:#7c3aed;
+      --nav-bg:rgba(255,255,255,.88);--menu-bg:rgba(255,255,255,.98);
+      --hover-bg:rgba(124,58,237,.08);
+      --hero-glow:#ede9fb;--vig-edge:rgba(245,244,249,.35);--vig-end:rgba(245,244,249,.9);
+      color-scheme:light;
     }
     /* Smooth theme transition on everything except canvas/animation */
     body,header,.topnav,.breadcrumb,.site-footer,section,
@@ -40,10 +65,19 @@
     body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;line-height:1.7;overflow-x:hidden;min-height:100vh}
 
     /* ── SPA shell ── */
-    #spa-root{display:flex;flex-direction:column;height:100vh;overflow:hidden;position:relative;z-index:1}
+    #spa-root{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;position:relative;z-index:1}
     .view-stage{position:relative;flex:1;overflow:hidden;min-height:0}
-    .view-page{position:absolute;inset:0;overflow:hidden;background:var(--bg);will-change:transform,opacity}
-    .view-page-inner{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+    .view-page{position:absolute;inset:0;overflow:hidden;background:var(--bg)}
+    .view-page.enter-right,.view-page.enter-left,.view-page.exit-left,.view-page.exit-right{will-change:transform,opacity}
+    .view-page-inner{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;outline:none}
+
+    /* ── Accessibility helpers ── */
+    .skip-link{position:fixed;top:-60px;left:1rem;z-index:100000;background:var(--accent2);color:#fff;padding:.6rem 1rem;border-radius:10px;text-decoration:none;font-size:.9rem;transition:top .2s}
+    .skip-link:focus{top:1rem}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+    .view-page-inner:focus-visible{outline:none}
+    img{max-width:100%}
 
     /* ── Page transition animations ── */
     @keyframes inRight {from{transform:translateX(60px) scale(.97);opacity:0}to{transform:none;opacity:1}}
@@ -53,39 +87,45 @@
     .enter-right{animation:inRight .42s cubic-bezier(.16,1,.3,1) forwards}
     .enter-left {animation:inLeft  .42s cubic-bezier(.16,1,.3,1) forwards}
     .exit-left  {animation:outLeft .28s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
-    .exit-right {animation:outRight.28s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
+    .exit-right {animation:outRight .28s cubic-bezier(.4,0,1,1) forwards;pointer-events:none}
 
     /* ── Top progress bar ── */
     .pg-bar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent2),var(--accent));z-index:99999;pointer-events:none;transition:width .3s ease}
 
     /* ── Topnav ── */
-    .topnav{background:rgba(13,13,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:.8rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;z-index:900;flex-shrink:0;position:relative;transition:background .3s,box-shadow .3s}
-    .topnav.scrolled{background:rgba(13,13,15,.97);box-shadow:0 4px 30px rgba(0,0,0,.4)}
-    .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--accent);cursor:pointer;text-shadow:0 0 18px rgba(167,139,250,.4);flex-shrink:0}
-    .theme-toggle{background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:all .25s;flex-shrink:0}
+    .topnav{background:var(--nav-bg);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;min-height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;gap:1rem;z-index:900;flex-shrink:0;position:relative;transition:background .3s,box-shadow .3s}
+    .nav-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--accent);cursor:pointer;text-shadow:0 0 18px rgba(167,139,250,.4);flex-shrink:0;background:none;border:none;padding:.25rem .35rem;border-radius:8px;line-height:1}
+    .nav-right{display:flex;align-items:center;gap:.75rem;min-width:0}
+    .theme-toggle{background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;transition:all .25s;flex-shrink:0}
     .theme-toggle:hover{color:var(--accent);border-color:rgba(167,139,250,.4);background:var(--accent-g)}
     :root.light .theme-toggle{background:var(--surface2);color:var(--accent)}
-    .nav-links{display:flex;gap:.2rem;flex-wrap:wrap;justify-content:flex-end}
-    .nav-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.87rem;padding:.45rem .85rem;border-radius:100px;transition:all .25s;font-weight:400}
-    .nav-btn:hover{color:var(--white);background:rgba(255,255,255,.07)}
-    .nav-btn.active{color:var(--accent);background:rgba(167,139,250,.1)}
-    .hamburger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px}
-    .hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:all .3s}
-    .mob-menu{display:none;position:fixed;top:0;left:0;right:0;background:rgba(13,13,15,.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);border-bottom:1px solid var(--border);flex-direction:column;padding:.75rem;z-index:950;margin-top:54px}
+    .nav-links{display:flex;gap:.2rem;flex-wrap:nowrap;justify-content:flex-end}
+    .nav-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.87rem;padding:.45rem .85rem;border-radius:100px;transition:all .25s;font-weight:400;white-space:nowrap}
+    .nav-btn:hover{color:var(--white);background:var(--hover-bg)}
+    .nav-btn.active{color:var(--accent);background:var(--accent-g)}
+    .hamburger{display:none;background:none;border:none;cursor:pointer;flex-direction:column;justify-content:center;align-items:center;gap:5px;width:40px;height:40px;border-radius:10px;flex-shrink:0}
+    .hamburger:hover{background:var(--hover-bg)}
+    .hamburger span{display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:transform .3s,opacity .3s}
+    .hamburger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .hamburger[aria-expanded="true"] span:nth-child(2){opacity:0}
+    .hamburger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .mob-menu{display:none;position:absolute;top:100%;left:0;right:0;background:var(--menu-bg);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);box-shadow:0 18px 40px rgba(0,0,0,.25);flex-direction:column;padding:.75rem;z-index:950;max-height:calc(100dvh - var(--nav-h));overflow-y:auto;animation:fadeIn .2s ease}
     .mob-menu.open{display:flex}
-    .mob-menu .nav-btn{text-align:left;border-radius:10px;padding:.65rem 1rem}
+    .mob-menu .nav-btn{text-align:left;border-radius:10px;padding:.8rem 1rem;font-size:1rem}
+    .mob-backdrop{position:fixed;inset:0;z-index:890;background:rgba(0,0,0,.35)}
 
     /* ── Breadcrumb ── */
-    .breadcrumb{background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 2rem;display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--muted);flex-shrink:0;position:relative;z-index:900}
-    .bc-home{cursor:pointer;color:var(--accent)}
+    .breadcrumb{background:var(--surface);border-bottom:1px solid var(--border);padding:.5rem 2rem;display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--muted);flex-shrink:0;position:relative;z-index:800}
+    .bc-home{cursor:pointer;color:var(--accent);background:none;border:none;font:inherit;padding:0;display:inline-flex;align-items:center;gap:.35rem}
     .bc-home:hover{text-decoration:underline}
     .bc-sep{opacity:.4}
     .bc-cur{color:var(--text);font-weight:500}
 
     /* ── Side dot nav ── */
-    .sidenav{position:fixed;right:1.25rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:.55rem;z-index:800}
-    .sdot{width:6px;height:6px;border-radius:50%;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.35);cursor:pointer;transition:background .25s,transform .25s}
-    .sdot:hover,.sdot.active{background:var(--accent);transform:scale(1.6)}
+    .sidenav{position:fixed;right:.9rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:.15rem;z-index:800}
+    .sdot{width:18px;height:18px;padding:0;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .sdot::before{content:'';width:6px;height:6px;border-radius:50%;background:rgba(167,139,250,.2);border:1px solid rgba(167,139,250,.35);transition:background .25s,transform .25s}
+    .sdot:hover::before,.sdot.active::before{background:var(--accent);transform:scale(1.6)}
 
     /* ── Page wrapper ── */
     .pg{max-width:1200px;margin:0 auto;padding:3.5rem 2rem 5rem}
@@ -98,11 +138,13 @@
     .sh-title::after{content:'';position:absolute;bottom:-6px;left:0;width:2.5rem;height:3px;background:var(--accent);border-radius:2px}
 
     /* ════ HERO ════ */
-    .hero{position:relative;min-height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 50% 0%,#1e0a3c 0%,var(--bg) 70%)}
-    :root.light .hero{background:radial-gradient(ellipse 80% 60% at 50% 0%,#ede9fb 0%,var(--bg) 70%)}
+    .hero{position:relative;min-height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse 80% 60% at 50% 0%,var(--hero-glow) 0%,var(--bg) 70%)}
     .hero-canvas{position:absolute;inset:0;width:100%!important;height:100%!important;z-index:0;pointer-events:none}
-    .hero-vignette{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 70% 55% at 50% 50%,transparent 30%,rgba(13,13,15,.55) 100%),linear-gradient(to bottom,transparent 60%,rgba(13,13,15,.95) 100%)}
-    .hero-inner{position:relative;z-index:2;display:flex;align-items:center;gap:4rem;padding:3rem 2rem;animation:fadeUp .9s ease both}
+    :root.light .hero-canvas{opacity:.35}
+    .hero-grain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.03;mix-blend-mode:overlay;z-index:1}
+    .hero-vignette{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 70% 55% at 50% 50%,transparent 30%,var(--vig-edge) 100%),linear-gradient(to bottom,transparent 60%,var(--vig-end) 100%)}
+    .hero-inner{position:relative;z-index:2;display:flex;align-items:center;gap:4rem;padding:3rem 2rem 6rem;max-width:1100px;width:100%;justify-content:center;animation:fadeUp .9s ease both}
+    .hero-text{min-width:0}
     .profile-wrap{position:relative;flex-shrink:0}
     .profile-ring{position:absolute;inset:-8px;border-radius:50%;background:conic-gradient(var(--accent),var(--accent2),var(--accent));animation:spin 8s linear infinite;opacity:.6}
     .profile-ring::after{content:'';position:absolute;inset:3px;border-radius:50%;background:var(--bg)}
@@ -118,7 +160,7 @@
     .hero-cta{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:2rem}
     .hero-cta-btn{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.28);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.85rem;padding:.5rem 1.15rem;border-radius:100px;cursor:pointer;transition:background .25s,border-color .25s,color .25s}
     .hero-cta-btn:hover{background:var(--accent2);border-color:var(--accent2);color:#fff}
-    .scroll-hint{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:var(--muted);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;z-index:2;animation:pulseY 2s ease infinite;cursor:pointer}
+    .scroll-hint{position:absolute;bottom:1.5rem;left:50%;transform:translateX(-50%);color:var(--muted);font-family:inherit;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;z-index:2;animation:pulseY 2s ease infinite;cursor:pointer;background:none;border:none;padding:.5rem .75rem}
 
     /* ════ ABOUT ════ */
     .about-layout{display:grid;grid-template-columns:1fr 1.6fr;gap:4rem;align-items:start}
@@ -143,7 +185,7 @@
     .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;width:0;transition:width 1.2s cubic-bezier(.16,1,.3,1);box-shadow:0 0 10px rgba(167,139,250,.3)}
 
     /* ════ PROJECTS ════ */
-    .project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem}
+    .project-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:1.5rem}
     .project-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:2rem;display:flex;flex-direction:column;gap:.85rem;transition:border-color .3s,transform .35s,box-shadow .35s}
     .project-card:hover{border-color:rgba(167,139,250,.35);transform:translateY(-5px);box-shadow:0 20px 50px rgba(0,0,0,.4),0 0 0 1px rgba(167,139,250,.1)}
     .project-top{display:flex;justify-content:space-between;align-items:center}
@@ -158,7 +200,7 @@
     .project-link:hover{gap:.7rem}
 
     /* ════ REPORTS ════ */
-    .reports-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.5rem}
+    .reports-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));gap:1.5rem}
     .report-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-lg);padding:2rem;display:flex;flex-direction:column;gap:.85rem;transition:border-color .3s,transform .3s}
     .report-card:hover{border-color:rgba(167,139,250,.3);transform:translateY(-4px)}
     .report-num{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:rgba(167,139,250,.18);line-height:1}
@@ -169,13 +211,20 @@
     .report-meta i{color:var(--accent);flex-shrink:0;margin-top:.15rem;font-size:.7rem}
     .report-btn{display:inline-flex;align-items:center;gap:.45rem;background:var(--accent-g);border:1px solid rgba(167,139,250,.25);color:var(--accent);font-size:.82rem;font-weight:500;padding:.55rem 1.1rem;border-radius:100px;text-decoration:none;transition:background .25s;align-self:flex-start;margin-top:auto;cursor:pointer;font-family:'DM Sans',sans-serif}
     .report-btn:hover{background:rgba(167,139,250,.22)}
-    .pdf-wrap{margin-top:2.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+    .report-btn[aria-pressed="true"]{background:var(--accent2);border-color:var(--accent2);color:#fff}
+    .pdf-wrap{margin-top:2.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;scroll-margin-top:1rem}
+    .pdf-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.85rem 1.25rem;border-bottom:1px solid var(--border);font-size:.85rem;color:var(--muted)}
+    .pdf-bar strong{color:var(--text);font-weight:500;min-width:0;overflow-wrap:anywhere}
+    .pdf-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+    .pdf-actions a,.pdf-actions button{display:inline-flex;align-items:center;gap:.4rem;font:inherit;font-size:.8rem;color:var(--accent);background:var(--accent-g);border:1px solid rgba(167,139,250,.25);padding:.4rem .85rem;border-radius:100px;text-decoration:none;cursor:pointer}
+    .pdf-frame{display:block;width:100%;height:min(75vh,760px);border:none;background:var(--surface2)}
 
     /* ════ CERTS ════ */
-    .certs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem}
+    .certs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:1.5rem}
     .cert-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;transition:border-color .3s,transform .3s}
     .cert-card:hover{border-color:rgba(167,139,250,.3);transform:translateY(-5px)}
-    .cert-img-wrap{position:relative;aspect-ratio:16/10;overflow:hidden;background:var(--surface2);cursor:pointer}
+    .cert-img-wrap{position:relative;display:block;width:100%;padding:0;border:none;aspect-ratio:16/10;overflow:hidden;background:var(--surface2);cursor:pointer}
+    .cert-img-wrap:focus-visible .cert-overlay{opacity:1}
     .cert-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
     .cert-img-wrap:hover img{transform:scale(1.04)}
     .cert-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;color:white;font-size:1.4rem;opacity:0;transition:opacity .3s}
@@ -184,9 +233,13 @@
     .cert-date{font-size:.7rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;font-weight:500;display:block;margin-bottom:.35rem}
     .cert-body h3{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--white);margin-bottom:.35rem;line-height:1.3}
     .cert-body p{font-size:.8rem;color:var(--muted);line-height:1.6}
-    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.93);display:flex;align-items:center;justify-content:center;z-index:9999;animation:fadeIn .2s ease}
-    .lightbox img{max-width:90vw;max-height:88vh;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
-    .lb-close{position:absolute;top:1.5rem;right:1.5rem;background:rgba(255,255,255,.1);border:none;color:white;width:44px;height:44px;border-radius:50%;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.93);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:4.5rem 1rem 1.5rem;z-index:9999;animation:fadeIn .2s ease}
+    .lightbox img{max-width:100%;max-height:calc(100dvh - 9rem);object-fit:contain;border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+    .lb-caption{color:#d4d4dc;font-size:.9rem;text-align:center;max-width:60ch}
+    .lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.1);border:none;color:#fff;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem}
+    .lb-nav:hover{background:rgba(255,255,255,.2)}
+    .lb-prev{left:1rem}.lb-next{right:1rem}
+    .lb-close{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.1);border:none;color:white;width:44px;height:44px;border-radius:50%;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
     .lb-close:hover{background:rgba(255,255,255,.2)}
 
     /* ════ RESUME ════ */
@@ -199,14 +252,20 @@
     .resume-dl{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;background:var(--accent2);color:white;font-size:.88rem;font-weight:500;padding:.75rem 1.5rem;border-radius:100px;text-decoration:none;transition:background .25s,transform .25s;margin-top:.5rem}
     .resume-dl:hover{background:#6d28d9;transform:translateY(-2px)}
     .resume-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
-    .resume-preview iframe{display:block;border:none}
+    .resume-preview iframe{display:block;border:none;width:100%;height:min(80vh,820px);background:var(--surface2)}
+    .resume-open{font-size:.85rem;color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:.4rem}
+    .resume-open:hover{text-decoration:underline}
+    .pdf-mobile-note{display:none;padding:2rem 1.5rem;text-align:center;color:var(--muted);font-size:.9rem}
+    .pdf-mobile-note i{display:block;font-size:2rem;color:var(--accent);margin-bottom:.75rem}
+    .pdf-mobile-note a{color:var(--accent)}
 
     /* ════ CONTACT ════ */
     .contact-layout{display:grid;grid-template-columns:1fr 1.4fr;gap:4rem;align-items:start}
     .contact-text h3{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--white);letter-spacing:-.03em;margin-bottom:1rem}
     .contact-text>p{color:var(--muted);font-size:.95rem;line-height:1.8;margin-bottom:2rem}
     .contact-links{display:flex;flex-direction:column;gap:.75rem}
-    .contact-links a{display:flex;align-items:center;gap:.75rem;color:var(--muted);text-decoration:none;font-size:.9rem;transition:color .2s}
+    .contact-links a{display:flex;align-items:center;gap:.75rem;color:var(--muted);text-decoration:none;font-size:.9rem;transition:color .2s;overflow-wrap:anywhere;min-width:0}
+    .form-status{font-size:.85rem;color:var(--accent);min-height:1.2em}
     .contact-links a:hover{color:var(--accent)}
     .contact-links a i{color:var(--accent);width:18px}
     .contact-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:2.5rem;display:flex;flex-direction:column;gap:1.25rem}
@@ -365,19 +424,57 @@
     @keyframes pulseY{0%,100%{opacity:.5;transform:translateX(-50%) translateY(0)}50%{opacity:1;transform:translateX(-50%) translateY(5px)}}
 
     /* ════ RESPONSIVE ════ */
-    @media(max-width:900px){.about-layout,.resume-wrap,.contact-layout{grid-template-columns:1fr;gap:2rem}}
-    @media(max-width:768px){
-      .hero-inner{flex-direction:column;text-align:center;gap:2rem}
-      .hero-badges,.hero-cta{justify-content:center}
-      .profile-img{width:150px;height:150px}
+    /* Tablet & below: hamburger menu instead of the full link row */
+    @media(max-width:1024px){
       .nav-links{display:none}
       .hamburger{display:flex}
-      .pg{padding:2rem 1.25rem 4rem}
+      .topnav{padding:0 1.25rem}
+      .breadcrumb{padding:.5rem 1.25rem}
       .sidenav{display:none}
     }
+    @media(max-width:900px){
+      .about-layout,.resume-wrap,.contact-layout{grid-template-columns:1fr;gap:2rem}
+      .resume-info{max-width:520px;width:100%;margin:0 auto}
+    }
+    @media(max-width:768px){
+      :root{--nav-h:56px}
+      .hero-inner{flex-direction:column;text-align:center;gap:1.75rem;padding:2.5rem 1.25rem 5.5rem}
+      .hero-badges,.hero-cta{justify-content:center}
+      .profile-img{width:150px;height:150px}
+      .pg{padding:2rem 1.25rem 3rem}
+      .sh{margin-bottom:2rem}
+      .contact-form{padding:1.5rem}
+      .contact-text h3{font-size:1.6rem}
+      .project-card,.report-card{padding:1.5rem}
+      .site-footer{padding:0 0 2rem;margin-top:3rem}
+      .footer-card{padding:2.25rem 1.25rem 1.75rem}
+      .footer-socials{gap:1rem 1.1rem}
+      .icon3d{width:52px;height:52px}
+      .icon3d-front{font-size:1.2rem}
+      .edu-card{padding:1rem 1.1rem;gap:1rem}
+      .edu-card:hover,.project-card:hover,.report-card:hover,.cert-card:hover{transform:none}
+      .lb-nav{top:auto;bottom:1rem;transform:none}
+    }
     @media(max-width:480px){
-      .hero h1{font-size:2.8rem}
-      .project-grid,.reports-grid,.certs-grid{grid-template-columns:1fr}
+      .hero h1{font-size:clamp(2.4rem,13vw,2.8rem)}
+      .hero-cta-btn{font-size:.8rem;padding:.45rem .95rem}
+      .submit-btn{align-self:stretch;justify-content:center}
+      .skill-label{gap:1rem}
+      .skill-name{font-size:.85rem}
+    }
+    /* Phones/tablets: browsers often can't render PDFs inside an iframe */
+    @media (hover:none) and (pointer:coarse) and (max-width:900px){
+      .pdf-frame,.resume-preview iframe{display:none}
+      .pdf-mobile-note{display:block}
+    }
+    /* Short landscape phones */
+    @media (max-height:520px) and (orientation:landscape){
+      .hero-inner{padding-top:1.5rem;padding-bottom:4rem}
+      .profile-img{width:110px;height:110px}
+      .scroll-hint{display:none}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
     }
   </style>
 </head>
@@ -428,15 +525,14 @@ const CERTIFICATES = [
   {title:"Forests and their Management",description:"Certified by NPTEL for successfully completing the course with a consolidated score.",issued:"Apr 2025",image:"Anivesh Gupta Forests and their Management Certificate.jpg"},
   {title:"Data Structures and Algorithms",description:"Certified by Infosys Springboard for successfully completing the course.",issued:"May 2025",image:"Anivesh Gupta Data Structures and Algorithms Certificate.jpg"},
   {title:"Cyber Security Job Simulation",description:"Certified by Deloitte and Forage for completing practical tasks in cybersecurity.",issued:"Jun 2025",image:"Anivesh Gupta Cyber Security Certificate.jpg"},
-  {title:"Data Science BootCamp",description:"Certified for completing a 6-week Data Science BootCamp on analytics and ML.",issued:"Jul 2025",image:"Anivesh gupta Data Science BootCamp Certificate.jpg"},
-  {title:"Oracle Cloud Infrastructure 2025 AI Foundations",description:"Certified by Oracle for successfully completing the AI Foundations Associate course.",issued:"Sep 2025",image:"Anivesh gupta Oracle Cloud Infrastructure 2025 AI Foundations Associate Certificate.jpg"},
+  {title:"Data Science BootCamp",description:"Certified for completing a 6-week Data Science BootCamp on analytics and ML.",issued:"Jul 2025",image:"Anivesh Gupta Data Science BootCamp Certificate.jpg"},
+  {title:"Oracle Cloud Infrastructure 2025 AI Foundations",description:"Certified by Oracle for successfully completing the AI Foundations Associate course.",issued:"Sep 2025",image:"Anivesh Gupta Oracle Cloud Infrastructure 2025 AI Foundations Associate Certificate.jpg"},
   {title:"Wild Life Ecology",description:"Certified by NPTEL for successfully completing the course with a consolidated score.",issued:"Oct 2025",image:"Anivesh Gupta Wild Life Ecology Certificate.jpg"},
   {title:"Human Computer Interaction",description:"Certified by NPTEL for successfully completing the course with a consolidated score.",issued:"Apr 2026",image:"Anivesh Gupta Human Computer Interaction Certificate.jpg"},
   {title:"IBM Java Developer",description:"Certified by IBM & SkillUp for completing the Java Developer course on Coursera.",issued:"Jun 2026",image:"Anivesh Gupta IBM Java Developer Certificate.jpg"},
   {title:"IBM Generative AI",description:"Certified by IBM for completing the Generative AI course offered by VIT.",issued:"July 2026",image:"Anivesh Gupta Generative AI Certificate.jpg"},
 ];
 const SOCIALS = [
-  {href:"https://twitter.com/yourcompany",icon:"fa-twitter",label:"Twitter"},
   {href:"https://www.linkedin.com/in/aniveshgupta/",icon:"fa-linkedin",label:"LinkedIn"},
   {href:"https://github.com/AniveshGuptaOfficial",icon:"fa-github",label:"GitHub"},
   {href:"https://www.facebook.com/Anivesh.GuptaJi",icon:"fa-facebook",label:"Facebook"},
@@ -448,47 +544,67 @@ const SOCIALS = [
 /* ══════════════════════════════════════════════
    ROUTER HOOK
 ══════════════════════════════════════════════ */
-function useRouter() {
-  const getView = () => { const h = window.location.hash.replace('#',''); return VIEWS.includes(h) ? h : 'home'; };
-  const [cur, setCur]  = useState(getView);
-  const [prev, setPrev]= useState(null);
-  const [dir, setDir]  = useState('right');
-  const [prog, setProg]= useState(0);
-  const [animating, setAnimating] = useState(false);
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const YEAR = new Date().getFullYear();
+const PAGE_TITLES = {home:'Anivesh Gupta — Portfolio',about:'About',skills:'Skills',projects:'Projects',reports:'Reports & Case Studies',certificates:'Certificates',resume:'Resume',contact:'Contact'};
 
-  const go = useCallback((to) => {
-    if (to === cur || animating) return;
-    const ci = VIEWS.indexOf(cur), ti = VIEWS.indexOf(to);
-    setDir(ti > ci ? 'right' : 'left');
-    setPrev(cur);
-    setCur(to);
-    setAnimating(true);
-    window.location.hash = to === 'home' ? '' : to;
+function useRouter() {
+  const getView = () => { const h = decodeURIComponent(window.location.hash.replace('#','')); return VIEWS.includes(h) ? h : 'home'; };
+  const [state, setState] = useState(() => ({ cur:getView(), prev:null, dir:'right', animating:false }));
+  const [prog, setProg] = useState(0);
+  const curRef = useRef(state.cur);
+  const timers = useRef([]);
+
+  // `fromHistory` = navigation came from back/forward, so don't push a new entry
+  const go = useCallback((to, fromHistory = false) => {
+    const from = curRef.current;
+    if (!VIEWS.includes(to) || to === from) return;
+    curRef.current = to;
+    timers.current.forEach(clearTimeout); timers.current = [];
+    if (!fromHistory) {
+      const url = to === 'home' ? window.location.pathname + window.location.search : '#' + to;
+      window.history.pushState(null, '', url);
+    }
+    const dir = VIEWS.indexOf(to) > VIEWS.indexOf(from) ? 'right' : 'left';
+    if (REDUCED_MOTION) { setState({ cur:to, prev:null, dir, animating:false }); return; }
+    setState({ cur:to, prev:from, dir, animating:true });
     setProg(40);
-    setTimeout(() => setProg(90), 200);
-    setTimeout(() => { setProg(100); }, 400);
-    setTimeout(() => { setProg(0); setAnimating(false); setPrev(null); }, 620);
-  }, [cur, animating]);
+    timers.current.push(
+      setTimeout(() => setProg(90), 200),
+      setTimeout(() => setProg(100), 400),
+      setTimeout(() => { setProg(0); setState(s => ({ ...s, prev:null, animating:false })); }, 620)
+    );
+  }, []);
 
   useEffect(() => {
-    const h = () => { const v = getView(); if (v !== cur) go(v); };
+    const h = () => go(getView(), true);
+    window.addEventListener('popstate', h);
     window.addEventListener('hashchange', h);
-    return () => window.removeEventListener('hashchange', h);
-  }, [cur, go]);
+    return () => { window.removeEventListener('popstate', h); window.removeEventListener('hashchange', h); };
+  }, [go]);
 
-  return { cur, prev, dir, prog, go, animating };
+  useEffect(() => {
+    document.title = state.cur === 'home' ? PAGE_TITLES.home : `${PAGE_TITLES[state.cur]} · Anivesh Gupta`;
+  }, [state.cur]);
+
+  return { ...state, prog, go };
 }
 
 /* ══════════════════════════════════════════════
    TOP NAV
 ══════════════════════════════════════════════ */
 function useTheme() {
-  const [dark, setDark] = useState(true);
-  const toggle = () => {
-    const next = !dark;
-    setDark(next);
-    document.documentElement.classList.toggle('light', !next);
-  };
+  const [dark, setDark] = useState(() => !document.documentElement.classList.contains('light'));
+  useEffect(() => {
+    document.documentElement.classList.toggle('light', !dark);
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#0d0d0f' : '#f5f4f9');
+  }, [dark]);
+  const toggle = () => setDark(d => {
+    const next = !d;
+    try { localStorage.setItem('theme', next ? 'dark' : 'light'); } catch(e) {}
+    return next;
+  });
   return { dark, toggle };
 }
 
@@ -496,32 +612,53 @@ function TopNav({ cur, go }) {
   const [mob, setMob] = useState(false);
   const { dark, toggle } = useTheme();
   const sections = VIEWS.filter(v => v !== 'home');
+
+  // Close the mobile menu on route change, Escape, or when resizing up to desktop
+  useEffect(() => { setMob(false); }, [cur]);
+  useEffect(() => {
+    if (!mob) return;
+    const onKey = e => { if (e.key === 'Escape') setMob(false); };
+    const mq = window.matchMedia('(min-width: 1025px)');
+    const onMq = e => { if (e.matches) setMob(false); };
+    window.addEventListener('keydown', onKey);
+    mq.addEventListener ? mq.addEventListener('change', onMq) : mq.addListener(onMq);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      mq.removeEventListener ? mq.removeEventListener('change', onMq) : mq.removeListener(onMq);
+    };
+  }, [mob]);
+
   return (
-    <nav className="topnav">
-      <div className="nav-logo" onClick={() => { go('home'); setMob(false); }}>AG</div>
-      <div className="nav-links">
-        {sections.map(v => (
-          <button key={v} className={`nav-btn${cur===v?' active':''}`} onClick={() => go(v)}>
-            {LABELS[v]}
+    <>
+      <nav className="topnav" aria-label="Main">
+        <button className="nav-logo" onClick={() => go('home')} aria-label="Anivesh Gupta — home">AG</button>
+        <div className="nav-right">
+          <div className="nav-links">
+            {sections.map(v => (
+              <button key={v} className={`nav-btn${cur===v?' active':''}`} aria-current={cur===v ? 'page' : undefined} onClick={() => go(v)}>
+                {LABELS[v]}
+              </button>
+            ))}
+          </div>
+          <button className="theme-toggle" onClick={toggle}
+            aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            title={dark ? 'Switch to light mode' : 'Switch to dark mode'}>
+            <i className={`fas ${dark ? 'fa-sun' : 'fa-moon'}`} aria-hidden="true"/>
           </button>
-        ))}
-      </div>
-      <button className="theme-toggle" onClick={toggle} title={dark ? 'Switch to light mode' : 'Switch to dark mode'}>
-        <i className={`fas ${dark ? 'fa-sun' : 'fa-moon'}`}/>
-      </button>
-      <button className="hamburger" onClick={() => setMob(o=>!o)} aria-label="Menu">
-        <span/><span/><span/>
-      </button>
-      <div className={`mob-menu${mob?' open':''}`}>
-        {sections.map(v => (
-          <button key={v} className={`nav-btn${cur===v?' active':''}`}
-            onClick={() => { go(v); setMob(false); }}>{LABELS[v]}</button>
-        ))}
-        <button className="nav-btn" onClick={toggle} style={{textAlign:'left'}}>
-          <i className={`fas ${dark ? 'fa-sun' : 'fa-moon'}`}/> {dark ? 'Light Mode' : 'Dark Mode'}
-        </button>
-      </div>
-    </nav>
+          <button className="hamburger" onClick={() => setMob(o=>!o)}
+            aria-label={mob ? 'Close menu' : 'Open menu'} aria-expanded={mob} aria-controls="mob-menu">
+            <span/><span/><span/>
+          </button>
+        </div>
+        <div id="mob-menu" className={`mob-menu${mob?' open':''}`} hidden={!mob}>
+          {sections.map(v => (
+            <button key={v} className={`nav-btn${cur===v?' active':''}`} aria-current={cur===v ? 'page' : undefined}
+              onClick={() => { go(v); setMob(false); }}>{LABELS[v]}</button>
+          ))}
+        </div>
+      </nav>
+      {mob && <div className="mob-backdrop" onClick={() => setMob(false)} aria-hidden="true"/>}
+    </>
   );
 }
 
@@ -531,11 +668,11 @@ function TopNav({ cur, go }) {
 function Breadcrumb({ cur, go }) {
   if (cur === 'home') return null;
   return (
-    <div className="breadcrumb">
-      <span className="bc-home" onClick={() => go('home')}><i className="fas fa-home"/> Home</span>
-      <span className="bc-sep">/</span>
-      <span className="bc-cur">{LABELS[cur]}</span>
-    </div>
+    <nav className="breadcrumb" aria-label="Breadcrumb">
+      <button className="bc-home" onClick={() => go('home')}><i className="fas fa-home" aria-hidden="true"/> Home</button>
+      <span className="bc-sep" aria-hidden="true">/</span>
+      <span className="bc-cur" aria-current="page">{LABELS[cur]}</span>
+    </nav>
   );
 }
 
@@ -546,13 +683,14 @@ function SideNav({ cur, go }) {
   if (cur === 'home') return null;
   const sections = VIEWS.filter(v => v !== 'home');
   return (
-    <div className="sidenav">
+    <nav className="sidenav" aria-label="Sections">
       {sections.map(v => (
-        <div key={v} title={LABELS[v]}
+        <button key={v} title={LABELS[v]} aria-label={LABELS[v]}
+          aria-current={cur===v ? 'page' : undefined}
           className={`sdot${cur===v?' active':''}`}
           onClick={() => go(v)}/>
       ))}
-    </div>
+    </nav>
   );
 }
 
@@ -584,9 +722,9 @@ function Footer() {
                 data-brand={getBrand(s.label)}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{animationDelay: `${i * 0.12}s`}}
+                title={s.label}
               >
-                <div className="icon3d-cube" style={{animationDelay: `${i * 0.12}s`}}>
+                <div className="icon3d-cube" style={{animationDelay: `${i * 0.12}s`}} aria-hidden="true">
                   {/* Front face */}
                   <div className="icon3d-face icon3d-front">
                     <i className={`${getPrefix(s.icon)} ${s.icon}`}/>
@@ -602,7 +740,7 @@ function Footer() {
             ))}
           </div>
 
-          <p className="footer-copy">© 2024 Anivesh Gupta · All rights reserved · Made with ❤️</p>
+          <p className="footer-copy">© {YEAR} Anivesh Gupta · All rights reserved · Made with ❤️</p>
         </div>
       </div>
     </footer>
@@ -615,43 +753,53 @@ function Footer() {
 
 /* ── HERO ── */
 function HeroPage({ go }) {
+  const canvasRef = useRef(null);
+  const grainRef  = useRef(null);
   useEffect(() => {
-    if (!document.getElementById('hero3d-script')) {
-      const s = document.createElement('script');
-      s.id = 'hero3d-script'; s.src = 'hero3d.js';
-      document.body.appendChild(s);
-    }
+    // Mount a fresh 3D scene every time the hero is shown, and tear it down on leave
+    let cleanup = null, tries = 0, timer = null, cancelled = false;
+    const tryMount = () => {
+      if (cancelled) return;
+      if (window.HeroScene && canvasRef.current) {
+        cleanup = window.HeroScene.mount(canvasRef.current, grainRef.current, { reducedMotion: REDUCED_MOTION });
+      } else if (tries++ < 50) {
+        timer = setTimeout(tryMount, 100);
+      }
+    };
+    tryMount();
+    return () => { cancelled = true; clearTimeout(timer); if (cleanup) cleanup(); };
   }, []);
   const sections = VIEWS.filter(v => v !== 'home');
   return (
-    <div className="hero">
-      <canvas id="hero-canvas" className="hero-canvas"/>
+    <section className="hero" aria-label="Introduction">
+      <canvas ref={canvasRef} className="hero-canvas" aria-hidden="true"/>
+      <canvas ref={grainRef} className="hero-grain" width="256" height="256" aria-hidden="true"/>
       <div className="hero-vignette"/>
       <div className="hero-inner">
         <div className="profile-wrap">
           <div className="profile-ring"/>
-          <img src="Anivesh Gupta.jpg" alt="Anivesh Gupta" className="profile-img"/>
+          <img src="Anivesh Gupta.jpg" alt="Portrait of Anivesh Gupta" className="profile-img" width="200" height="200"/>
         </div>
-        <div>
-          <span className="hero-tag">Portfolio 2025</span>
+        <div className="hero-text">
+          <span className="hero-tag">Portfolio {YEAR}</span>
           <h1>Anivesh<br/><em>Gupta</em></h1>
           <p className="hero-sub">Web Developer <span className="amp">&amp;</span> Designer</p>
           <div className="hero-badges">
-            <span className="badge"><i className="fas fa-map-marker-alt"/> VIT Vellore</span>
-            <span className="badge"><i className="fas fa-code"/> Full-Stack</span>
-            <span className="badge"><i className="fas fa-brain"/> ML / AI</span>
+            <span className="badge"><i className="fas fa-map-marker-alt" aria-hidden="true"/> VIT Vellore</span>
+            <span className="badge"><i className="fas fa-code" aria-hidden="true"/> Full-Stack</span>
+            <span className="badge"><i className="fas fa-brain" aria-hidden="true"/> ML / AI</span>
           </div>
-          <div className="hero-cta">
+          <nav className="hero-cta" aria-label="Sections">
             {sections.map(v => (
               <button key={v} className="hero-cta-btn" onClick={() => go(v)}>{LABELS[v]}</button>
             ))}
-          </div>
+          </nav>
         </div>
       </div>
-      <div className="scroll-hint" onClick={() => go('about')}>
-        explore <i className="fas fa-arrow-down"/>
-      </div>
-    </div>
+      <button className="scroll-hint" onClick={() => go('about')}>
+        explore <i className="fas fa-arrow-down" aria-hidden="true"/>
+      </button>
+    </section>
   );
 }
 
@@ -747,31 +895,53 @@ function ProjectsPage() {
 }
 
 /* ── REPORTS ── */
+function PdfFallback({ src }) {
+  return (
+    <div className="pdf-mobile-note">
+      <i className="fas fa-file-pdf" aria-hidden="true"/>
+      PDF previews aren't supported in this browser. <a href={encodeURI(src)} target="_blank" rel="noopener noreferrer">Open the PDF</a> instead.
+    </div>
+  );
+}
+
 function ReportsPage() {
   const [activePdf, setActivePdf] = useState(null);
+  const viewerRef = useRef(null);
+  const active = REPORTS.find(r => r.pdf === activePdf);
+  useEffect(() => {
+    if (activePdf && viewerRef.current) viewerRef.current.scrollIntoView({ behavior: REDUCED_MOTION ? 'auto' : 'smooth', block: 'start' });
+  }, [activePdf]);
   return (
     <div className="pg wide">
       <div className="sh"><span className="sh-num">{NUMS.reports}</span><h2 className="sh-title">Reports &amp; Case Studies</h2></div>
       <div className="reports-grid">
         {REPORTS.map((r,i) => (
           <div className="report-card" key={i}>
-            <div className="report-num">0{i+1}</div>
+            <div className="report-num" aria-hidden="true">{String(i+1).padStart(2,'0')}</div>
             <h3>{r.title}</h3>
             <p>{r.description}</p>
             <div className="report-meta">
-              <span><i className="fas fa-tools"/> {r.tech}</span>
-              <span><i className="fas fa-calendar-alt"/> {r.completed}</span>
+              <span><i className="fas fa-tools" aria-hidden="true"/> {r.tech}</span>
+              <span><i className="fas fa-calendar-alt" aria-hidden="true"/> {r.completed}</span>
             </div>
-            <button className="report-btn"
+            <button className="report-btn" aria-pressed={activePdf===r.pdf}
               onClick={() => setActivePdf(activePdf===r.pdf ? null : r.pdf)}>
-              {activePdf===r.pdf ? 'Close PDF ✕' : <>View Report <i className="fas fa-file-pdf"/></>}
+              {activePdf===r.pdf ? <>Close PDF <i className="fas fa-times" aria-hidden="true"/></> : <>View Report <i className="fas fa-file-pdf" aria-hidden="true"/></>}
             </button>
           </div>
         ))}
       </div>
-      {activePdf && (
-        <div className="pdf-wrap">
-          <iframe src={activePdf} width="100%" height="650px" style={{border:'none'}}/>
+      {active && (
+        <div className="pdf-wrap" ref={viewerRef}>
+          <div className="pdf-bar">
+            <strong>{active.title}</strong>
+            <div className="pdf-actions">
+              <a href={encodeURI(active.pdf)} target="_blank" rel="noopener noreferrer"><i className="fas fa-external-link-alt" aria-hidden="true"/> Open</a>
+              <button onClick={() => setActivePdf(null)}><i className="fas fa-times" aria-hidden="true"/> Close</button>
+            </div>
+          </div>
+          <iframe className="pdf-frame" src={encodeURI(active.pdf)} title={`${active.title} (PDF)`}/>
+          <PdfFallback src={active.pdf}/>
         </div>
       )}
       <Footer/>
@@ -780,6 +950,34 @@ function ReportsPage() {
 }
 
 /* ── CERTIFICATES ── */
+function Lightbox({ index, setIndex }) {
+  const closeRef = useRef(null);
+  const c = CERTIFICATES[index];
+  const n = CERTIFICATES.length;
+  useEffect(() => {
+    const prevFocus = document.activeElement;
+    closeRef.current && closeRef.current.focus();
+    const onKey = e => {
+      if (e.key === 'Escape') setIndex(null);
+      else if (e.key === 'ArrowRight') setIndex(i => (i + 1) % n);
+      else if (e.key === 'ArrowLeft')  setIndex(i => (i - 1 + n) % n);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => { window.removeEventListener('keydown', onKey); prevFocus && prevFocus.focus && prevFocus.focus(); };
+  }, []);
+  // Rendered into <body> so it covers the whole viewport (incl. the nav bar)
+  return ReactDOM.createPortal(
+    <div className="lightbox" role="dialog" aria-modal="true" aria-label={c.title} onClick={() => setIndex(null)}>
+      <img src={c.image} alt={`${c.title} certificate`} onClick={e => e.stopPropagation()}/>
+      <p className="lb-caption" onClick={e => e.stopPropagation()}>{c.title} · {c.issued} <span style={{opacity:.6}}>({index+1}/{n})</span></p>
+      <button className="lb-nav lb-prev" aria-label="Previous certificate" onClick={e => { e.stopPropagation(); setIndex(i => (i - 1 + n) % n); }}><i className="fas fa-chevron-left" aria-hidden="true"/></button>
+      <button className="lb-nav lb-next" aria-label="Next certificate" onClick={e => { e.stopPropagation(); setIndex(i => (i + 1) % n); }}><i className="fas fa-chevron-right" aria-hidden="true"/></button>
+      <button ref={closeRef} className="lb-close" aria-label="Close" onClick={() => setIndex(null)}>&times;</button>
+    </div>,
+    document.body
+  );
+}
+
 function CertificatesPage() {
   const [lb, setLb] = useState(null);
   return (
@@ -788,10 +986,10 @@ function CertificatesPage() {
       <div className="certs-grid">
         {CERTIFICATES.map((c,i) => (
           <div className="cert-card" key={i}>
-            <div className="cert-img-wrap" onClick={() => setLb(c.image)}>
-              <img src={c.image} alt={c.title}/>
-              <div className="cert-overlay"><i className="fas fa-expand"/></div>
-            </div>
+            <button className="cert-img-wrap" onClick={() => setLb(i)} aria-label={`View ${c.title} certificate`}>
+              <img src={c.image} alt="" loading="lazy" decoding="async"/>
+              <div className="cert-overlay" aria-hidden="true"><i className="fas fa-expand"/></div>
+            </button>
             <div className="cert-body">
               <span className="cert-date">{c.issued}</span>
               <h3>{c.title}</h3>
@@ -800,12 +998,7 @@ function CertificatesPage() {
           </div>
         ))}
       </div>
-      {lb && (
-        <div className="lightbox" onClick={() => setLb(null)}>
-          <img src={lb} alt="Certificate" onClick={e => e.stopPropagation()}/>
-          <button className="lb-close" onClick={() => setLb(null)}>&times;</button>
-        </div>
-      )}
+      {lb !== null && <Lightbox index={lb} setIndex={setLb}/>}
       <Footer/>
     </div>
   );
@@ -818,14 +1011,16 @@ function ResumePage() {
       <div className="sh"><span className="sh-num">{NUMS.resume}</span><h2 className="sh-title">Resume</h2></div>
       <div className="resume-wrap">
         <div className="resume-info">
-          <div className="resume-icon"><i className="fas fa-file-alt"/></div>
+          <div className="resume-icon" aria-hidden="true"><i className="fas fa-file-alt"/></div>
           <h3>My Resume</h3>
           <p>View or download my professional resume to learn more about my skills, experience, and achievements.</p>
-          <p className="resume-updated"><i className="fas fa-sync-alt"/> Updated: July 2026</p>
-          <a href="Resume.pdf" download className="resume-dl"><i className="fas fa-download"/> Download PDF</a>
+          <p className="resume-updated"><i className="fas fa-sync-alt" aria-hidden="true"/> Updated: July 2026</p>
+          <a href="Resume.pdf" download="Anivesh_Gupta_Resume.pdf" className="resume-dl"><i className="fas fa-download" aria-hidden="true"/> Download PDF</a>
+          <a href="Resume.pdf" target="_blank" rel="noopener noreferrer" className="resume-open"><i className="fas fa-external-link-alt" aria-hidden="true"/> Open in new tab</a>
         </div>
         <div className="resume-preview">
-          <iframe src="Resume.pdf" width="100%" height="520px"/>
+          <iframe src="Resume.pdf" title="Resume of Anivesh Gupta (PDF)"/>
+          <PdfFallback src="Resume.pdf"/>
         </div>
       </div>
       <Footer/>
@@ -835,7 +1030,18 @@ function ResumePage() {
 
 /* ── CONTACT ── */
 function ContactPage() {
-  const submit = e => { e.preventDefault(); alert("Thank you! I'll get back to you soon."); e.target.reset(); };
+  const [status, setStatus] = useState('');
+  // No backend: open the visitor's mail app with the message pre-filled
+  const submit = e => {
+    e.preventDefault();
+    const f = e.target;
+    const name = f.elements.name.value.trim(), email = f.elements.email.value.trim(), msg = f.elements.message.value.trim();
+    const subject = encodeURIComponent(`Portfolio enquiry from ${name}`);
+    const body = encodeURIComponent(`${msg}\n\n— ${name} (${email})`);
+    window.location.href = `mailto:aniveshgupta13579@gmail.com?subject=${subject}&body=${body}`;
+    setStatus("Opening your email app… Thanks, I'll get back to you soon!");
+    f.reset();
+  };
   return (
     <div className="pg">
       <div className="sh"><span className="sh-num">{NUMS.contact}</span><h2 className="sh-title">Contact Me</h2></div>
@@ -850,10 +1056,11 @@ function ContactPage() {
           </div>
         </div>
         <form className="contact-form" onSubmit={submit}>
-          <div className="form-group"><label>Your Name</label><input type="text" placeholder="Rahul Sharma" required/></div>
-          <div className="form-group"><label>Email Address</label><input type="email" placeholder="rahul@example.com" required/></div>
-          <div className="form-group"><label>Message</label><textarea rows="5" placeholder="Hello Anivesh, I'd love to discuss..." required/></div>
-          <button type="submit" className="submit-btn">Send Message <i className="fas fa-paper-plane"/></button>
+          <div className="form-group"><label htmlFor="cf-name">Your Name</label><input id="cf-name" name="name" type="text" autoComplete="name" placeholder="Rahul Sharma" required/></div>
+          <div className="form-group"><label htmlFor="cf-email">Email Address</label><input id="cf-email" name="email" type="email" autoComplete="email" inputMode="email" placeholder="rahul@example.com" required/></div>
+          <div className="form-group"><label htmlFor="cf-msg">Message</label><textarea id="cf-msg" name="message" rows="5" placeholder="Hello Anivesh, I'd love to discuss..." required/></div>
+          <button type="submit" className="submit-btn">Send Message <i className="fas fa-paper-plane" aria-hidden="true"/></button>
+          <p className="form-status" role="status" aria-live="polite">{status}</p>
         </form>
       </div>
       <Footer/>
@@ -865,27 +1072,37 @@ function ContactPage() {
    APP  —  view-swap router
 ══════════════════════════════════════════════ */
 /* ── ScrollTop wrapper: resets scroll to top on every mount ── */
-function Page({ children }) {
+let firstPage = true;
+function Page({ children, active }) {
   const ref = useRef(null);
-  useEffect(() => { if (ref.current) ref.current.scrollTop = 0; }, []);
-  return <div ref={ref} className="view-page-inner">{children}</div>;
+  useEffect(() => {
+    if (!ref.current) return;
+    ref.current.scrollTop = 0;
+    // Move focus into the new view so keyboard / screen-reader users land on it
+    // (and arrow/space keys scroll it). Skip on the very first load.
+    if (active && !firstPage) ref.current.focus({ preventScroll: true });
+    if (active) firstPage = false;
+  }, []);
+  return <div ref={ref} className="view-page-inner" tabIndex={active ? -1 : undefined} id={active ? 'main' : undefined}>{children}</div>;
 }
 
 function App() {
   const { cur, prev, dir, prog, go, animating } = useRouter();
 
-  const renderView = (v) => {
-    switch(v) {
-      case 'home':         return <Page><HeroPage go={go}/></Page>;
-      case 'about':        return <Page><AboutPage/></Page>;
-      case 'skills':       return <Page><SkillsPage/></Page>;
-      case 'projects':     return <Page><ProjectsPage/></Page>;
-      case 'reports':      return <Page><ReportsPage/></Page>;
-      case 'certificates': return <Page><CertificatesPage/></Page>;
-      case 'resume':       return <Page><ResumePage/></Page>;
-      case 'contact':      return <Page><ContactPage/></Page>;
-      default:             return <Page><HeroPage go={go}/></Page>;
-    }
+  const renderView = (v, active) => {
+    const body = (() => {
+      switch(v) {
+        case 'about':        return <AboutPage/>;
+        case 'skills':       return <SkillsPage/>;
+        case 'projects':     return <ProjectsPage/>;
+        case 'reports':      return <ReportsPage/>;
+        case 'certificates': return <CertificatesPage/>;
+        case 'resume':       return <ResumePage/>;
+        case 'contact':      return <ContactPage/>;
+        default:             return <HeroPage go={go}/>;
+      }
+    })();
+    return <Page active={active}>{body}</Page>;
   };
 
   const enterClass = dir === 'right' ? 'enter-right' : 'enter-left';
@@ -893,21 +1110,22 @@ function App() {
 
   return (
     <div id="spa-root">
-      {prog > 0 && <div className="pg-bar" style={{width:`${prog}%`}}/>}
+      <a className="skip-link" href="#main" onClick={e => { e.preventDefault(); const m = document.getElementById('main'); m && m.focus(); }}>Skip to content</a>
+      {prog > 0 && <div className="pg-bar" style={{width:`${prog}%`}} aria-hidden="true"/>}
 
       <TopNav cur={cur} go={go}/>
       <Breadcrumb cur={cur} go={go}/>
 
-      <div className="view-stage">
+      <main className="view-stage">
         {animating && prev && (
-          <div className={`view-page ${exitClass}`} key={`exit-${prev}`}>
-            {renderView(prev)}
+          <div className={`view-page ${exitClass}`} key={prev} aria-hidden="true" inert="">
+            {renderView(prev, false)}
           </div>
         )}
         <div className={`view-page ${animating ? enterClass : ''}`} key={cur}>
-          {renderView(cur)}
+          {renderView(cur, true)}
         </div>
-      </div>
+      </main>
 
       <SideNav cur={cur} go={go}/>
       <CursorFX/>
@@ -925,8 +1143,10 @@ function CursorFX() {
   const ambientRef = useRef(null);
 
   useEffect(() => {
-    const IS_MOBILE = window.matchMedia('(pointer:coarse)').matches;
-    if (IS_MOBILE) { initTouchRipple(); initAmbient(); return; }
+    // Custom cursor only for real mouse/trackpad users who haven't asked for reduced motion
+    const FINE_POINTER = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+    if (REDUCED_MOTION) return;
+    if (!FINE_POINTER) { initTouchRipple(); initAmbient(); return; }
 
     // ── hide native cursor ──
     const styleEl = document.createElement('style');
@@ -1091,8 +1311,12 @@ function CursorFX() {
     const lerp=(a,b,t)=>a+(b-a)*t;
     const rand=(a,b)=>a+Math.random()*(b-a);
     const mouse={x:W*.5,y:H*.5}, sm={x:W*.5,y:H*.5};
-    // Read theme color dynamically each frame
-    const getColor=()=>getComputedStyle(document.documentElement).getPropertyValue('--ambient-color').trim()||'#a78bfa';
+    // Theme colour, refreshed only when the theme class changes (not per particle per frame)
+    let themeColor='#a78bfa';
+    const readColor=()=>{ themeColor=getComputedStyle(document.documentElement).getPropertyValue('--ambient-color').trim()||'#a78bfa'; };
+    readColor();
+    new MutationObserver(readColor).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+    const getColor=()=>themeColor;
     window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
     window.addEventListener('touchmove',e=>{mouse.x=e.touches[0].clientX;mouse.y=e.touches[0].clientY;},{passive:true});
 
@@ -1170,7 +1394,7 @@ function CursorFX() {
     cvs.width=window.innerWidth; cvs.height=window.innerHeight;
     window.addEventListener('resize',()=>{cvs.width=window.innerWidth;cvs.height=window.innerHeight;});
     const rips=[];
-    document.addEventListener('touchstart',e=>{ const t=e.touches[0]; rips.push({x:t.clientX,y:t.clientY,r:0,life:1}); });
+    document.addEventListener('touchstart',e=>{ const t=e.touches[0]; rips.push({x:t.clientX,y:t.clientY,r:0,life:1}); },{passive:true});
     (function loop(){
       requestAnimationFrame(loop);
       ctx.clearRect(0,0,cvs.width,cvs.height);
@@ -1187,14 +1411,14 @@ function CursorFX() {
   return (
     <>
       {/* Ambient layer — behind all content */}
-      <canvas ref={ambientRef} style={{position:'fixed',inset:0,width:'100vw',height:'100vh',zIndex:0,pointerEvents:'none',mixBlendMode:'screen',opacity:.5}}/>
+      <canvas ref={ambientRef} aria-hidden="true" style={{position:'fixed',inset:0,width:'100%',height:'100%',zIndex:0,pointerEvents:'none',mixBlendMode:'screen',opacity:.5}}/>
       {/* Cursor canvas — above all content */}
-      <canvas ref={cursorRef} style={{position:'fixed',inset:0,width:'100vw',height:'100vh',zIndex:2147483647,pointerEvents:'none'}}/>
+      <canvas ref={cursorRef} aria-hidden="true" style={{position:'fixed',inset:0,width:'100%',height:'100%',zIndex:2147483647,pointerEvents:'none'}}/>
     </>
   );
 }
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
 </body>
 </html>
