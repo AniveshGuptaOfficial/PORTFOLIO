@@ -529,7 +529,13 @@ const SKILLS = [
   {name:"Design and Analysis of Algorithms",pct:78},
 ];
 const PROJECTS = [
-  {icon:"fa-shopping-bag",title:"VTrade",description:"A virtual window shopping experience that lets users browse products without purchasing.",tech:["HTML","CSS","JavaScript","Tailwind CSS"],link:"https://vtrade-ten.vercel.app/",linkText:"View Project",status:"live"},
+  {icon:"fa-search",title:"Tactic Lens",status:"wip"},
+  {icon:"fa-heartbeat",title:"Self Check Ultrasound",description:"An image-quality-aware cardiac ultrasound (echo) research prototype that decides when a scan is good enough to diagnose and, when it is not, guides the operator to re-acquire. Tested on 500 CAMUS patients: re-scanning rejected cases with the other view raised accuracy from 57% to 85%.",tech:["Python","PyTorch","ResNet-18","Scikit-learn","NumPy","Pandas"],link:"https://github.com/AniveshGuptaOfficial/Self_Check_Ultrasound",linkText:"View on GitHub",status:"wip"},
+  {icon:"fa-shopping-bag",title:"VTrade",description:"Campus-first e-commerce for VIT Vellore: shop partner stores, buy and sell second-hand items with private in-app chat, and hire delivery workers with code-verified handovers.",tech:["HTML","CSS","JavaScript","Java 17","Spring Boot","Spring Security (JWT)","PostgreSQL"],link:"https://vtrade-ten.vercel.app/",linkText:"View Project",status:"live"},
+  {icon:"fa-solar-panel",title:"ATERNET",description:"Adaptive Temporal Expert Routing Network that forecasts the next 8 hours of solar PV power as P10 / P50 / P90 intervals, with weather-conditioned expert routing and non-crossing quantile decoding.",tech:["Python","PyTorch","PatchTST","Mixture of Experts","Streamlit"],link:"https://github.com/AniveshGuptaOfficial/ATERNET",linkText:"View on GitHub",status:"live"},
+  {icon:"fa-ambulance",title:"Vaidyum — Helpline Triage",description:"An intent-routed, LLM-based triage system for rural healthcare helplines that detects emergencies first, then routes medicine queries and appointment bookings to dedicated pipelines.",tech:["Dart","Flutter","NLP","LLM","Intent Classification"],link:"https://github.com/AniveshGuptaOfficial/helpline-triage-nlp",linkText:"View on GitHub",status:"live"},
+  {icon:"fa-universal-access",title:"A-RWMF Accessibility Scoring",description:"Offline web accessibility scoring that fuses contrast, target size, layout, alt-text and link-text checks into one 0–100 score, validated against a multi-rater human study.",tech:["Python","OpenCV","CLIP","MiniLM","axe-core"],link:"https://github.com/AniveshGuptaOfficial/ARWMF-Web-Accessibility-Scoring",linkText:"View on GitHub",status:"live"},
+  {icon:"fa-qrcode",title:"Smart Medicine Authentication",description:"A full-stack medicine shopping platform with QR-based authenticity checks backed by a blockchain-style ledger to fight counterfeit drugs.",tech:["Node.js","Express.js","SQLite","JWT","Blockchain"],link:"https://github.com/AniveshGuptaOfficial/SmartMedicineAuthSystem",linkText:"View on GitHub",status:"live"},
   {icon:"fa-book",title:"Books4MU",description:"A platform to access and share university book resources.",tech:["HTML","CSS","JavaScript"],link:"https://aniveshguptaofficial.github.io/Books-For-My-University/",linkText:"In Progress",status:"wip"},
   {icon:"fa-hand-paper",title:"Real-Time Sign Language Recognition",description:"An intelligent real-time hand gesture recognition system that converts sign language into text and speech using MediaPipe and an SVM (RBF kernel) classifier.",tech:["Python","OpenCV","MediaPipe","NumPy","Pandas","Scikit-learn (SVM)","Pyttsx3"],link:"https://github.com/AniveshGuptaOfficial/Real-Time-Sign-Language-Recognition-System",linkText:"View on GitHub",status:"live"},
   {icon:"fa-chess",title:"Chess",description:"A fully functional chess game with multiplayer support.",tech:["HTML","CSS","JavaScript"],link:"#",linkText:"In Progress",status:"wip"},
@@ -542,9 +548,9 @@ const PROJECTS = [
    when:    optional time hint ("Dec 2026", "This week", "Soon")
    spoiler: optional hidden text — visitors tap to reveal it */
 const SPOTLIGHT = [
-  {label:"Coming soon",icon:"fa-rocket",title:"Something big is loading",text:"A new build is taking shape behind the scenes.",when:"Soon",spoiler:"Your spoiler goes here. Visitors tap to reveal it."},
-  {label:"Learning",icon:"fa-book-open",title:"Currently studying",text:"What I'm reading, practising or taking a course in right now.",spoiler:"Name the topic here."},
-  {label:"Idea",icon:"fa-lightbulb",title:"On the drawing board",text:"An idea I'm thinking about but haven't started yet.",spoiler:"Describe the idea here."},
+  {label:"In progress",icon:"fa-search",title:"Tactic Lens"},
+  {label:"In progress",icon:"fa-heartbeat",title:"Self Check Ultrasound"},
+  {label:"Writing",icon:"fa-feather-alt",title:"Who Writes The Ending"},
 ];
 const REPORTS = [
   {title:"Caste-Based Politics",description:"A detailed analysis of how caste influences political mobilization, representation, and governance in India. Explores key thinkers like B.R. Ambedkar and M.N. Srinivas.",tech:"Sociological Analysis, Political Frameworks, Policy Review",completed:"October 2025",pdf:"Caste Based Politics.pdf"},
@@ -955,11 +961,11 @@ function ProjectsPage() {
               {p.status==='live' && <span className="live-badge">Live</span>}
             </div>
             <h3>{p.title}</h3>
-            <p>{p.description}</p>
-            <div className="tech-tags">{p.tech.map((t,j)=><span className="tag" key={j}>{t}</span>)}</div>
-            <a href={p.link} className="project-link" target="_blank" rel="noopener noreferrer">
+            {p.description && <p>{p.description}</p>}
+            {p.tech && <div className="tech-tags">{p.tech.map((t,j)=><span className="tag" key={j}>{t}</span>)}</div>}
+            {p.link && <a href={p.link} className="project-link" target="_blank" rel="noopener noreferrer">
               {p.linkText} <i className="fas fa-arrow-right"/>
-            </a>
+            </a>}
           </div>
         ))}
       </div>
