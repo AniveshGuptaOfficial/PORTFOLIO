@@ -32,6 +32,7 @@ window.MEDIA_IDS = {
   "Anivesh Gupta Human Computer Interaction Certificate.jpg": "1wscyBBAK8K94UoY9djJyj-uJjvLMwbDR",
   "Anivesh Gupta IBM Java Developer Certificate.jpg": "1NaI_FM5Bmn_i7_AdlUA6zU8_zi2Y-Roj",
   "Anivesh Gupta Generative AI Certificate.jpg": "1hQ5FTTiAWreUEMn22AATTpw5iUBEAb3Q",
+  "Anivesh Gupta Advanced Generative AI Certificate.jpg": "13i88T5uI9HEYFiIjggjNIknIgsYaVWpo",
 
   // ── Reports & case studies ──
   "Caste Based Politics.pdf": "1LHaibbIa6NdpusGyCw-KyCzq_9_mrYpS",
