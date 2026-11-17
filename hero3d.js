@@ -7,17 +7,16 @@
 (function () {
   'use strict';
 
-  // ─── Wait for THREE to be available ───────────────────────────────────────
-  function waitForThree(cb, tries = 0) {
-    if (typeof THREE !== 'undefined') { cb(); return; }
-    if (tries > 60) return;
-    setTimeout(() => waitForThree(cb, tries + 1), 100);
-  }
-
-  // ─── Init on DOM ready ────────────────────────────────────────────────────
-  function init() {
-    const canvas = document.getElementById('hero-canvas');
-    if (!canvas) return;
+  /**
+   * mount(canvas, grainCanvas?, opts?) → cleanup()
+   * Builds the scene on the given canvas. Call the returned function to stop
+   * the animation loop, remove listeners and free GPU resources.
+   */
+  function mount(canvas, grainCanvas, opts) {
+    opts = opts || {};
+    if (!canvas || typeof THREE === 'undefined') return function () {};
+    const IS_SMALL = Math.min(window.innerWidth, window.innerHeight) < 600 ||
+                     window.matchMedia('(pointer:coarse)').matches;
 
     // ── Renderer ────────────────────────────────────────────────────────────
     const renderer = new THREE.WebGLRenderer({
@@ -26,8 +25,9 @@
       alpha: true,
       powerPreference: 'high-performance',
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(canvas.offsetWidth || window.innerWidth, canvas.offsetHeight || window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, IS_SMALL ? 1.5 : 2));
+    // `false` = don't write inline px sizes; CSS keeps the canvas at 100% of the hero
+    renderer.setSize(canvas.clientWidth || window.innerWidth, canvas.clientHeight || window.innerHeight, false);
     renderer.setClearColor(0x000000, 0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.1;
@@ -36,7 +36,7 @@
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       55,
-      canvas.offsetWidth / canvas.offsetHeight,
+      (canvas.clientWidth || 1) / (canvas.clientHeight || 1),
       0.1,
       200
     );
@@ -185,7 +185,7 @@
     // ══════════════════════════════════════════════════════════════════════════
     //  FLOATING PARTICLES
     // ══════════════════════════════════════════════════════════════════════════
-    const PARTICLE_COUNT = 420;
+    const PARTICLE_COUNT = IS_SMALL ? 220 : 420;
     const pPositions = new Float32Array(PARTICLE_COUNT * 3);
     const pSizes     = new Float32Array(PARTICLE_COUNT);
     const pPhases    = new Float32Array(PARTICLE_COUNT);
@@ -275,17 +275,10 @@
     // ══════════════════════════════════════════════════════════════════════════
     //  FILM GRAIN OVERLAY (canvas 2D, composited via CSS)
     // ══════════════════════════════════════════════════════════════════════════
-    const grainCanvas = document.createElement('canvas');
-    grainCanvas.width  = 256;
-    grainCanvas.height = 256;
-    grainCanvas.style.cssText = `
-      position:absolute;inset:0;width:100%;height:100%;
-      pointer-events:none;opacity:0.03;mix-blend-mode:overlay;
-      z-index:2;border-radius:inherit;
-    `;
-    const grainCtx = grainCanvas.getContext('2d');
+    const grainCtx = grainCanvas ? grainCanvas.getContext('2d') : null;
 
     function refreshGrain() {
+      if (!grainCtx) return;
       const imgData = grainCtx.createImageData(256, 256);
       for (let i = 0; i < imgData.data.length; i += 4) {
         const v = Math.random() * 255 | 0;
@@ -295,7 +288,6 @@
       grainCtx.putImageData(imgData, 0, 0);
     }
     refreshGrain();
-    canvas.parentElement.appendChild(grainCanvas);
 
     // ══════════════════════════════════════════════════════════════════════════
     //  ANIMATION LOOP
@@ -304,11 +296,14 @@
     const clock = new THREE.Clock();
 
     // Camera orbit parameters
-    const CAM_RADIUS = 11;
+    let CAM_RADIUS = 11;
     const CAM_SPEED  = 0.055; // radians/sec
 
+    let rafId = 0, visible = true, stopped = false;
     function animate() {
-      requestAnimationFrame(animate);
+      if (stopped) return;
+      rafId = requestAnimationFrame(animate);
+      if (!visible) return;
       const t = clock.getElapsedTime();
       frameCount++;
 
@@ -354,26 +349,59 @@
       renderer.render(scene, camera);
     }
 
-    animate();
-
-    // ── Resize handler ───────────────────────────────────────────────────────
-    function onResize() {
-      const w = canvas.offsetWidth;
-      const h = canvas.offsetHeight;
-      if (!w || !h) return;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+    if (opts.reducedMotion) {
+      // Render a single still frame instead of a continuous animation
+      renderer.render(scene, camera);
+    } else {
+      animate();
     }
 
-    window.addEventListener('resize', onResize);
-    setTimeout(onResize, 200); // after layout settles
+    // ── Resize handling (observes the canvas itself, not just the window) ──
+    function onResize() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      if (!w || !h) return;
+      camera.aspect = w / h;
+      // Narrow/portrait screens: move the camera back so the structure fits
+      CAM_RADIUS = camera.aspect < 0.8 ? 15 : camera.aspect < 1.2 ? 13 : 11;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h, false);
+      if (opts.reducedMotion) {
+        camera.position.set(0, 0, CAM_RADIUS);
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+      }
+    }
+    let ro = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      ro = new ResizeObserver(onResize);
+      ro.observe(canvas);
+    } else {
+      window.addEventListener('resize', onResize);
+    }
+    onResize();
+
+    // Pause rendering while the hero is scrolled out of view
+    let io = null;
+    if (typeof IntersectionObserver !== 'undefined') {
+      io = new IntersectionObserver(entries => { visible = entries[0].isIntersecting; });
+      io.observe(canvas);
+    }
+
+    return function cleanup() {
+      stopped = true;
+      cancelAnimationFrame(rafId);
+      if (ro) ro.disconnect(); else window.removeEventListener('resize', onResize);
+      if (io) io.disconnect();
+      scene.traverse(obj => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          (Array.isArray(obj.material) ? obj.material : [obj.material]).forEach(m => m.dispose());
+        }
+      });
+      renderer.dispose();
+    };
   }
 
-  // ─── Entry ────────────────────────────────────────────────────────────────
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => waitForThree(init));
-  } else {
-    waitForThree(init);
-  }
+  window.HeroScene = { mount };
 })();
