@@ -1,0 +1,17 @@
+# Media is hosted on Google Drive (see media.js) — keep it out of git
+media/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.svg
+*.pdf
+*.mp4
+*.webm
+*.docx
+*.pptx
+
+# Editor / tool folders
+.claude/
+.vscode/
